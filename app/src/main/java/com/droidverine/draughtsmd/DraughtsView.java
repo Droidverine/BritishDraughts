@@ -25,6 +25,7 @@ public class DraughtsView extends View {
     private String[][] players;
     private String[][] moveable;
     private String[][] moveableplayer1;
+    private boolean[][] allowedmove;
     int cellHeight;
     int cellWidth;
     int movement = 1;
@@ -63,6 +64,8 @@ public class DraughtsView extends View {
         numbRows = 8;
         numberofwhitedraughts = 12;
         highlightarr = new boolean[numbRows][numbColumns];
+        allowedmove = new boolean[numbRows][numbColumns];
+
         players = new String[numbRows][numbColumns];
         Selectedmove = new String[numbRows][numbColumns];
         SelectedPlayer = new String[numbRows][numbColumns];
@@ -324,9 +327,10 @@ public class DraughtsView extends View {
                                 cellHeight, (col + 1) * cellWidth, (row +
                                 1) * cellHeight, paint);
                         highlightarr[row][col] = false;
+                        allowedmove[row][col] = true;
                         players[row][col] = null;
                         Selectedmove[row][col] = "move";
-                        Log.d("movement", "" + Selectedmove[row][col]);
+                        Log.d("allowed moves", "row: " + row + "col :" + col + " " + allowedmove[row][col]);
 
 
                         selectedmoveflag = true;
@@ -362,13 +366,13 @@ public class DraughtsView extends View {
                 for (int i = 0; i < numbRows; i++) {
                     for (int j = 0; j < numbColumns; j++) {
                         if (players[i][j] == "player2") {
-                            if (i != 0 && j != 0 && players[i - 1][j - 1] == "player1" && i > 1 && j > 1 && players[i - 2][j - 2] == null) {
+                            if (i != 0 && j != 0 && (players[i - 1][j - 1] == "player1" || players[i - 1][j - 1] == "player1king") && i > 1 && j > 1 && players[i - 2][j - 2] == null) {
 
                                 moveable[i][j] = "must";
                                 comp = true;
                                 Log.d("Green cmp", "Row :" + i + " Column:" + j + " status: " + players[i][j]);
 
-                            } else if (i != 0 && j != 7 && players[i - 1][j + 1] == "player1" && i > 1 && j < 6 && players[i - 2][j + 2] == null) {
+                            } else if (i != 0 && j != 7 && (players[i - 1][j + 1] == "player1" || players[i - 1][j + 1] == "player1king") && i > 1 && j < 6 && players[i - 2][j + 2] == null) {
 
                                 moveable[i][j] = "must";
                                 comp = true;
@@ -380,13 +384,25 @@ public class DraughtsView extends View {
                         } else if (players[i][j] == "player2king") {
                             //   Log.d("King cmp", "Row :" + i + " Column:" + j + " status: " + players[i][j]);
 
-                            if (i < 6 && j > 1 && players[i + 1][j - 1] == "player1" && players[i + 2][j - 2] == null) {
+                            if (i < 6 && j > 1 && (players[i + 1][j - 1] == "player1" || players[i + 1][j - 1] == "player1king") && players[i + 2][j - 2] == null) {
 
                                 moveable[i][j] = "must";
                                 comp = true;
                                 Log.d("King cmp", "Row :" + i + " Column:" + j + " status: " + players[i][j]);
 
-                            } else if (i < 7 && j < 6 && players[i + 1][j + 1] == "player1" && players[i + 2][j + 2] == null) {
+                            } else if (i < 7 && j < 6 && (players[i + 1][j + 1] == "player1" || players[i + 1][j + 1] == "player1king") && players[i + 2][j + 2] == null) {
+
+                                moveable[i][j] = "must";
+                                comp = true;
+                                Log.d("King cmp", "Row :" + i + " Column:" + j + " status: " + players[i][j]);
+
+                            } else if (i != 0 && j > 1 && (players[i - 1][j - 1] == "player1" || players[i - 1][j - 1] == "player1king") && players[i - 2][j - 2] == null) {
+
+                                moveable[i][j] = "must";
+                                comp = true;
+                                Log.d("King cmp", "Row :" + i + " Column:" + j + " status: " + players[i][j]);
+
+                            } else if (i != 0 && j < 6 && (players[i - 1][j + 1] == "player1" || players[i - 1][j + 1] == "player1king") && players[i - 2][j + 2] == null) {
 
                                 moveable[i][j] = "must";
                                 comp = true;
@@ -405,11 +421,12 @@ public class DraughtsView extends View {
 
 ///////Green Right
                         if (players[row][column] == "player2") {
-                            if (players[row][column] == "player2" && row > 1 && column < 6 && players[row - 1][column + 1] == "player1" && players[row - 2][column + 2] == null) {
+                            if (players[row][column] == "player2" && row > 1 && column < 6 && (players[row - 1][column + 1] == "player1" || players[row - 1][column + 1] == "player1king") && players[row - 2][column + 2] == null) {
                                 SelectedPlayer[row][column] = players[row][column];
                                 Selectedplayerrow = row;
                                 SelectedPlayercol = column;
                                 highlightarr[row - 2][column + 2] = true;
+                                //  allowedmove[row-2][column+2]=true;
                                 highlight++;
                                 Log.d("GreenCheck", "Blue mila " + players[row - 2][column + 2]);
 
@@ -420,19 +437,23 @@ public class DraughtsView extends View {
                                     Selectedplayerrow = row;
                                     SelectedPlayercol = column;
                                     highlightarr[row - 1][column + 1] = true;
+                                    //  allowedmove[row-1][column+1]=true;
+
                                     highlight++;
 
                                 }
                             }
-                        } else if (players[row][column] == "player2king") {
+                        } else if (comp != true && moveable[row][column] != "must" && players[row][column] == "player2king") {
 
                             if (row < 6 && column < 6 && players[row + 1][column + 1] == "player1" && players[row + 2][column + 2] == null) {
                                 SelectedPlayer[row][column] = players[row][column];
                                 Selectedplayerrow = row;
                                 SelectedPlayercol = column;
                                 highlightarr[row + 2][column + 2] = true;
+                                //   allowedmove[row+2][column+2]=true;
+
                                 highlight++;
-                                Log.d("King Check", "Blue mila " + players[row - 2][column + 2]);
+                                //  Log.d("King Check", "Blue mila " + players[row - 2][column + 2]);
 
 
                             } else {
@@ -441,10 +462,36 @@ public class DraughtsView extends View {
                                     Selectedplayerrow = row;
                                     SelectedPlayercol = column;
                                     highlightarr[row + 1][column + 1] = true;
+                                    allowedmove[row + 1][column + 1] = true;
+
                                     highlight++;
 
                                 }
                             }
+                            if (row > 1 && column < 6 && (players[row - 1][column + 1] == "player1" || players[row - 1][column + 1] == "player1king") && players[row - 2][column + 2] == null) {
+                                SelectedPlayer[row][column] = players[row][column];
+                                Selectedplayerrow = row;
+                                SelectedPlayercol = column;
+                                highlightarr[row - 2][column + 2] = true;
+                                //  allowedmove[row-2][column+2]=true;
+
+                                highlight++;
+                                Log.d("GreenCheck", "Blue mila " + players[row - 2][column + 2]);
+
+
+                            } else {
+                                if (row > 0 && players[row - 1][column + 1] == null) {
+                                    SelectedPlayer[row][column] = players[row][column];
+                                    Selectedplayerrow = row;
+                                    SelectedPlayercol = column;
+                                    highlightarr[row - 1][column + 1] = true;
+                                    //     allowedmove[row - 1][column + 1] = true;
+
+                                    highlight++;
+
+                                }
+                            }
+
                         }
 
                     }
@@ -460,7 +507,7 @@ public class DraughtsView extends View {
                                 SelectedPlayercol = column;
                                 highlight++;
 
-                            } else if (row > 1 && column > 0 && players[row - 1][column - 1] == "player1" && column != 1 && players[row - 2][column - 2] == null) {
+                            } else if (row > 1 && column > 0 && (players[row - 1][column - 1] == "player1" || players[row - 1][column - 1] == "player1king") && column != 1 && players[row - 2][column - 2] == null) {
                                 SelectedPlayer[row][column] = players[row][column];
                                 Selectedplayerrow = row;
                                 SelectedPlayercol = column;
@@ -471,7 +518,7 @@ public class DraughtsView extends View {
                             }
 
 
-                        } else if (players[row][column] == "player2king") {
+                        } else if (comp != true && moveable[row][column] != "must" && players[row][column] == "player2king") {
                             if (row < 6 && column > 1 && players[row + 1][column - 1] == "player1" && players[row + 2][column - 2] == null) {
                                 SelectedPlayer[row][column] = players[row][column];
                                 Selectedplayerrow = row;
@@ -490,6 +537,27 @@ public class DraughtsView extends View {
                                     highlight++;
 
                                 }
+
+                            }
+                            if (row > 1 && column > 1 && (players[row - 1][column - 1] == "player1" || players[row - 1][column - 1] == "player1king") && players[row - 2][column - 2] == null) {
+                                SelectedPlayer[row][column] = players[row][column];
+                                Selectedplayerrow = row;
+                                SelectedPlayercol = column;
+                                highlightarr[row - 2][column - 2] = true;
+                                highlight++;
+                                Log.d("King Check", "Blue mila " + players[row - 2][column - 2]);
+
+
+                            } else {
+                                if (row > 0 && players[row - 1][column - 1] == null) {
+                                    SelectedPlayer[row][column] = players[row][column];
+                                    Selectedplayerrow = row;
+                                    SelectedPlayercol = column;
+                                    highlightarr[row - 1][column - 1] = true;
+                                    highlight++;
+
+                                }
+
                             }
                         }
 
@@ -503,7 +571,7 @@ public class DraughtsView extends View {
 
 ///////Green Right
 
-                            if (row > 1 && column < 6 && players[row - 1][column + 1] == "player1" && players[row - 2][column + 2] == null) {
+                            if (row > 1 && column < 6 && (players[row - 1][column + 1] == "player1" || players[row - 1][column + 1] == "player1king") && players[row - 2][column + 2] == null) {
                                 SelectedPlayer[row][column] = players[row][column];
                                 Selectedplayerrow = row;
                                 SelectedPlayercol = column;
@@ -519,7 +587,7 @@ public class DraughtsView extends View {
 
 ///////Green LEFT
 
-                            if (row > 1 && column > 0 && players[row - 1][column - 1] == "player1" && column != 1 && players[row - 2][column - 2] == null) {
+                            if (row > 1 && column > 0 && (players[row - 1][column - 1] == "player1" || players[row - 1][column - 1] == "player1") && column != 1 && players[row - 2][column - 2] == null) {
                                 SelectedPlayer[row][column] = players[row][column];
                                 Selectedplayerrow = row;
                                 SelectedPlayercol = column;
@@ -533,16 +601,25 @@ public class DraughtsView extends View {
                         }
 
 
-                    } else if (players[row][column] == "player2king") {
+                    } else if (comp == true && moveable[row][column] == "must" && players[row][column] == "player2king") {
                         if (column != 7) {
 
 ///////Green Right
 
-                            if (row < 7 && column < 6 && players[row + 1][column + 1] == "player1" && players[row + 2][column + 2] == null) {
+                            if (row < 7 && column < 6 && (players[row + 1][column + 1] == "player1" || players[row + 1][column + 1] == "player1king") && players[row + 2][column + 2] == null) {
                                 SelectedPlayer[row][column] = players[row][column];
                                 Selectedplayerrow = row;
                                 SelectedPlayercol = column;
                                 highlightarr[row + 2][column + 2] = true;
+                                highlight++;
+                                //  Log.d("GreenCheck", "Blue mila " + players[row - 2][column + 2]);
+
+
+                            } else if (row > 1 && column < 6 && (players[row - 1][column + 1] == "player1" || players[row - 1][column + 1] == "player1king") && players[row - 2][column + 2] == null) {
+                                SelectedPlayer[row][column] = players[row][column];
+                                Selectedplayerrow = row;
+                                SelectedPlayercol = column;
+                                highlightarr[row - 2][column + 2] = true;
                                 highlight++;
                                 //  Log.d("GreenCheck", "Blue mila " + players[row - 2][column + 2]);
 
@@ -552,13 +629,21 @@ public class DraughtsView extends View {
                         }
                         if (column != 0) {
 
-///////Green LEFTgIT
+///////Green LEFT
 
-                            if (row < 7 && column > 0 && players[row + 1][column - 1] == "player1" && column != 1 && players[row + 2][column - 2] == null) {
+                            if (row < 7 && column > 0 && (players[row + 1][column - 1] == "player1" || players[row + 1][column - 1] == "player1king") && column != 1 && players[row + 2][column - 2] == null) {
                                 SelectedPlayer[row][column] = players[row][column];
                                 Selectedplayerrow = row;
                                 SelectedPlayercol = column;
                                 highlightarr[row + 2][column - 2] = true;
+                                highlight++;
+                                //     Log.d("GreenCheck", "Blue mila " + players[row - 2][column - 2]);
+
+                            } else if (row > 1 && column > 0 && (players[row - 1][column - 1] == "player1" || players[row - 1][column - 1] == "player1king") && column != 1 && players[row - 2][column - 2] == null) {
+                                SelectedPlayer[row][column] = players[row][column];
+                                Selectedplayerrow = row;
+                                SelectedPlayercol = column;
+                                highlightarr[row - 2][column - 2] = true;
                                 highlight++;
                                 //     Log.d("GreenCheck", "Blue mila " + players[row - 2][column - 2]);
 
@@ -573,7 +658,7 @@ public class DraughtsView extends View {
                 }
                 for (int i = 0; i < numbRows; i++) {
                     for (int j = 0; j < numbColumns; j++) {
-                        moveableplayer1[row][column] = null;
+                        moveable[row][column] = null;
 
                     }
                 }
@@ -583,131 +668,311 @@ public class DraughtsView extends View {
 
 // To check Blue & force move
             //need to set player movemable or note
-            else if (movement == 0 && players[row][column] == "player1") {
+            else if (movement == 0) {
                 Log.d("BLue bhetla", "player1");
 
                 for (int i = 0; i < numbRows; i++) {
-
                     for (int j = 0; j < numbColumns; j++) {
                         if (players[i][j] == "player1") {
                             if (i != 7 && j != 0 && (players[i + 1][j - 1] == "player2" || players[i + 1][j - 1] == "player2king") && i < 6 && j > 1 && players[i + 2][j - 2] == null) {
 
-                                moveableplayer1[i][j] = "must";
+                                moveable[i][j] = "must";
                                 comp = true;
-                                Log.d("BLue bhetla", "Row :" + i + " Column:" + j + " status: " + players[i][j]);
+                                Log.d("Blue cmp", "Row :" + i + " Column:" + j + " status: " + players[i][j]);
 
                             } else if (i != 7 && j != 7 && (players[i + 1][j + 1] == "player2" || players[i + 1][j + 1] == "player2king") && i < 6 && j < 6 && players[i + 2][j + 2] == null) {
 
-                                moveableplayer1[i][j] = "must";
+                                moveable[i][j] = "must";
                                 comp = true;
-                                Log.d("BLue bhetla", "Row :" + i + " Column:" + j + " status: " + players[i][j]);
-
-                            } else {
-                                Log.d("BLue bhetla", "Nothing");
+                                Log.d("Blue cmp", "Row :" + i + " Column:" + j + " status: " + players[i][j]);
 
                             }
 
 
+                        } else if (players[i][j] == "player1king") {
+                            //   Log.d("King cmp", "Row :" + i + " Column:" + j + " status: " + players[i][j]);
+
+                            if (i < 6 && j > 1 && (players[i + 1][j - 1] == "player2" || players[i + 1][j - 1] == "player2king") && players[i + 2][j - 2] == null) {
+
+                                moveable[i][j] = "must";
+                                comp = true;
+                                Log.d("King cmp", "Row :" + i + " Column:" + j + " status: " + players[i][j]);
+
+                            } else if (i < 7 && j < 6 && (players[i + 1][j + 1] == "player2" || players[i + 1][j + 1] == "player2king") && players[i + 2][j + 2] == null) {
+
+                                moveable[i][j] = "must";
+                                comp = true;
+                                Log.d("King cmp", "Row :" + i + " Column:" + j + " status: " + players[i][j]);
+
+                            } else if (i > 1 && j > 1 && (players[i - 1][j - 1] == "player2" || players[i - 1][j - 1] == "player2king") && players[i - 2][j - 2] == null) {
+
+                                moveable[i][j] = "must";
+                                comp = true;
+                                Log.d("King cmp", "Row :" + i + " Column:" + j + " status: " + players[i][j]);
+
+                            } else if (i > 1 && j < 6 && (players[i - 1][j + 1] == "player2" || players[i - 1][j + 1] == "player2king") && players[i - 2][j + 2] == null) {
+
+                                moveable[i][j] = "must";
+                                comp = true;
+                                Log.d("King cmp", "Row :" + i + " Column:" + j + " status: " + players[i][j]);
+
+                            }
                         }
                     }
                 }
                 //New Highlight
-                if (comp != true && moveableplayer1[row][column] != "must" && movement == 0) {
+                if (comp != true && moveable[row][column] != "must" && movement == 0) {
                     Log.d("BlueMove", "Row :" + row + " Column:" + column + " status: " + players[row][column]);
-                    if (column != 7 && row != 7) {
-                        if (players[row][column] == "player1" && players[row + 1][column + 1] == null) {
-                            Log.d("Bluecheck", "left check " + players[row + 1][column + 1]);
-                            highlightarr[row + 1][column + 1] = true;
-                            highlight++;
-                            SelectedPlayer[row][column] = players[row][column];
-                            Selectedplayerrow = row;
-                            SelectedPlayercol = column;
-                        } else if (players[row][column] == "player1" && column < 6 && row < 6 && (players[row + 1][column + 1] == "player2" || players[row + 1][column + 1] == "player2king") && players[row + 2][column + 2] == null) {
 
-
-                            Log.d("Bluecheck", "left check " + players[row + 1][column + 1]);
-                            highlightarr[row + 2][column + 2] = true;
-                            highlight++;
-                            SelectedPlayer[row][column] = players[row][column];
-                            Selectedplayerrow = row;
-                            SelectedPlayercol = column;
-
-
-                        }
-
-
-                    }
-                    if (column != 0 && row != 7) {
-                        if (players[row][column] == "player1" && players[row + 1][column - 1] == null) {
-                            Log.d("Blackcheck", "right check " + players[row + 1][column - 1]);
-
-                            highlightarr[row + 1][column - 1] = true;
-                            highlight++;
-                            SelectedPlayer[row][column] = players[row][column];
-                            Selectedplayerrow = row;
-                            SelectedPlayercol = column;
-
-                        } else if (players[row][column] == "player1" && column > 1 && row < 6 && (players[row + 1][column - 1] == "player2" || players[row + 1][column - 1] == "player2king") && column != 1 && players[row + 2][column - 2] == null) {
-                            highlightarr[row + 2][column - 2] = true;
-                            highlight++;
-                            SelectedPlayer[row][column] = players[row][column];
-                            Selectedplayerrow = row;
-                            SelectedPlayercol = column;
-
-                        }
-
-                    }
-
-
-                }
-
-                if (comp == true && moveableplayer1[row][column] == "must") {
                     if (column != 7) {
 
 ///////Blue Right
+                        if (players[row][column] == "player1") {
+                            if (players[row][column] == "player1" && row < 7 && column < 6 && (players[row + 1][column + 1] == "player2" || players[row + 1][column + 1] == "player2king") && players[row + 2][column + 2] == null) {
+                                SelectedPlayer[row][column] = players[row][column];
+                                Selectedplayerrow = row;
+                                SelectedPlayercol = column;
+                                highlightarr[row + 2][column + 2] = true;
+                                //  allowedmove[row-2][column+2]=true;
+                                highlight++;
+                                //    Log.d("GreenCheck", "Blue mila " + players[row - 2][column + 2]);
 
-                        if (row < 6 && column < 6 && (players[row + 1][column + 1] == "player2" || players[row + 1][column + 1] == "player2king") && players[row + 2][column + 2] == null) {
-                            SelectedPlayer[row][column] = players[row][column];
-                            Selectedplayerrow = row;
-                            SelectedPlayercol = column;
-                            highlightarr[row + 2][column + 2] = true;
-                            highlight++;
-                            Log.d("BLue", "Blue mila " + players[row + 2][column + 2]);
 
+                            } else {
+                                if (players[row][column] == "player1" && row < 7 && players[row + 1][column + 1] == null) {
+                                    SelectedPlayer[row][column] = players[row][column];
+                                    Selectedplayerrow = row;
+                                    SelectedPlayercol = column;
+                                    highlightarr[row + 1][column + 1] = true;
+                                    //  allowedmove[row-1][column+1]=true;
+
+                                    highlight++;
+
+                                }
+                            }
+                        } else if (comp != true && moveableplayer1[row][column] != "must" && players[row][column] == "player1king") {
+
+                            if (row < 6 && column < 6 && (players[row + 1][column + 1] == "player2" || players[row + 1][column + 1] == "player2king") && players[row + 2][column + 2] == null) {
+                                SelectedPlayer[row][column] = players[row][column];
+                                Selectedplayerrow = row;
+                                SelectedPlayercol = column;
+                                highlightarr[row + 2][column + 2] = true;
+                                //   allowedmove[row+2][column+2]=true;
+
+                                highlight++;
+                                Log.d("King Check", "Blue mila " + players[row - 2][column + 2]);
+
+
+                            } else {
+                                if (row < 7 && players[row + 1][column + 1] == null) {
+                                    SelectedPlayer[row][column] = players[row][column];
+                                    Selectedplayerrow = row;
+                                    SelectedPlayercol = column;
+                                    highlightarr[row + 1][column + 1] = true;
+                                    allowedmove[row + 1][column + 1] = true;
+
+                                    highlight++;
+
+                                }
+                            }
+                            if (row > 1 && column < 6 && (players[row - 1][column + 1] == "player2" || players[row - 1][column + 1] == "player2king") && players[row - 2][column + 2] == null) {
+                                SelectedPlayer[row][column] = players[row][column];
+                                Selectedplayerrow = row;
+                                SelectedPlayercol = column;
+                                highlightarr[row - 2][column + 2] = true;
+                                //  allowedmove[row-2][column+2]=true;
+
+                                highlight++;
+                                Log.d("GreenCheck", "Blue mila " + players[row - 2][column + 2]);
+
+
+                            } else {
+                                if (row > 1 && players[row - 1][column + 1] == null) {
+                                    SelectedPlayer[row][column] = players[row][column];
+                                    Selectedplayerrow = row;
+                                    SelectedPlayercol = column;
+                                    highlightarr[row - 1][column + 1] = true;
+                                    //     allowedmove[row - 1][column + 1] = true;
+
+                                    highlight++;
+
+                                }
+                            }
 
                         }
 
                     }
                     if (column != 0) {
 
-///////Blue LEFT
+///////Green LEFT
+                        if (players[row][column] == "player1") {
+                            if (row < 7 && players[row + 1][column - 1] == null) {
+                                Log.d("BlueCheck", "Left check " + players[row + 1][column - 1]);
+                                highlightarr[row + 1][column - 1] = true;
+                                SelectedPlayer[row][column] = players[row][column];
+                                Selectedplayerrow = row;
+                                SelectedPlayercol = column;
+                                highlight++;
 
-                        if (row < 6 && column > 0 && (players[row + 1][column - 1] == "player2" || players[row + 1][column - 1] == "player2king") && column != 1 && players[row + 2][column - 2] == null) {
-                            SelectedPlayer[row][column] = players[row][column];
-                            Selectedplayerrow = row;
-                            SelectedPlayercol = column;
-                            highlightarr[row + 2][column - 2] = true;
-                            highlight++;
-                            Log.d("BLue", "Blue mila " + players[row + 2][column - 2]);
+                            } else if (row < 6 && column > 0 && (players[row + 1][column - 1] == "player2" || players[row + 1][column - 1] == "player2king") && column != 1 && players[row + 2][column - 2] == null) {
+                                SelectedPlayer[row][column] = players[row][column];
+                                Selectedplayerrow = row;
+                                SelectedPlayercol = column;
+                                highlightarr[row + 2][column - 2] = true;
+                                highlight++;
+//                                Log.d("BlueCheck", "Blue mila " + players[row - 2][column - 2]);
+
+                            }
+
+
+                        } else if (comp != true && moveable[row][column] != "must" && players[row][column] == "player1king") {
+                            if (row > 1 && column > 1 && (players[row - 1][column - 1] == "player2" || players[row - 1][column - 1] == "player2king") && players[row - 2][column - 2] == null) {
+                                SelectedPlayer[row][column] = players[row][column];
+                                Selectedplayerrow = row;
+                                SelectedPlayercol = column;
+                                highlightarr[row - 2][column - 2] = true;
+                                highlight++;
+                                // Log.d("King Check", "Blue mila " + players[row + 2][column - 2]);
+
+
+                            } else {
+                                if (row > 0 && column > 0 && players[row - 1][column - 1] == null) {
+                                    SelectedPlayer[row][column] = players[row][column];
+                                    Selectedplayerrow = row;
+                                    SelectedPlayercol = column;
+                                    highlightarr[row - 1][column - 1] = true;
+                                    highlight++;
+
+                                }
+
+                            }
+                            if (row > 1 && column > 1 && (players[row - 1][column - 1] == "player2" || players[row - 1][column - 1] == "player2king") && players[row - 2][column - 2] == null) {
+                                SelectedPlayer[row][column] = players[row][column];
+                                Selectedplayerrow = row;
+                                SelectedPlayercol = column;
+                                highlightarr[row - 2][column - 2] = true;
+                                highlight++;
+                                // Log.d("King Check", "Blue mila " + players[row - 2][column - 2]);
+
+
+                            } else {
+                                if (row < 7 && players[row + 1][column - 1] == null) {
+                                    SelectedPlayer[row][column] = players[row][column];
+                                    Selectedplayerrow = row;
+                                    SelectedPlayercol = column;
+                                    highlightarr[row + 1][column - 1] = true;
+                                    highlight++;
+
+                                }
+
+                            }
+                        }
+
+                    }
+
+
+                }
+                if (comp == true && moveable[row][column] == "must") {
+                    if (players[row][column] == "player1") {
+                        if (column != 7) {
+
+///////Green Right
+
+                            if (row < 6 && column < 6 && (players[row + 1][column + 1] == "player2" || players[row + 1][column + 1] == "player2king") && players[row + 2][column + 2] == null) {
+                                SelectedPlayer[row][column] = players[row][column];
+                                Selectedplayerrow = row;
+                                SelectedPlayercol = column;
+                                highlightarr[row + 2][column + 2] = true;
+                                highlight++;
+                                //Log.d("GreenCheck", "Blue mila " + players[row - 2][column + 2]);
+
+
+                            }
+
+                        }
+                        if (column != 0) {
+
+///////Green LEFT
+
+                            if (row < 6 && column > 0 && (players[row + 1][column - 1] == "player2" || players[row + 1][column - 1] == "player2king") && column != 1 && players[row + 2][column - 2] == null) {
+                                SelectedPlayer[row][column] = players[row][column];
+                                Selectedplayerrow = row;
+                                SelectedPlayercol = column;
+                                highlightarr[row + 2][column - 2] = true;
+                                highlight++;
+                                //  Log.d("GreenCheck", "Blue mila " + players[row - 2][column - 2]);
+
+                            }
+
+
+                        }
+
+
+                    } else if (comp == true && moveable[row][column] == "must" && players[row][column] == "player1king") {
+                        if (column != 7) {
+
+///////Green Right
+
+                            if (row < 7 && column < 6 && (players[row + 1][column + 1] == "player2" || players[row + 1][column + 1] == "player2king") && players[row + 2][column + 2] == null) {
+                                SelectedPlayer[row][column] = players[row][column];
+                                Selectedplayerrow = row;
+                                SelectedPlayercol = column;
+                                highlightarr[row + 2][column + 2] = true;
+                                highlight++;
+                                //  Log.d("GreenCheck", "Blue mila " + players[row - 2][column + 2]);
+
+
+                            } else if (row > 1 && column < 6 && (players[row - 1][column + 1] == "player2" || players[row - 1][column + 1] == "player2king") && players[row - 2][column + 2] == null) {
+                                SelectedPlayer[row][column] = players[row][column];
+                                Selectedplayerrow = row;
+                                SelectedPlayercol = column;
+                                highlightarr[row - 2][column + 2] = true;
+                                highlight++;
+                                //  Log.d("GreenCheck", "Blue mila " + players[row - 2][column + 2]);
+
+
+                            }
+
+                        }
+                        if (column != 0) {
+
+///////Green LEFT
+
+                            if (row < 7 && column > 0 && (players[row + 1][column - 1] == "player2" || players[row + 1][column - 1] == "player2king") && column != 1 && players[row + 2][column - 2] == null) {
+                                SelectedPlayer[row][column] = players[row][column];
+                                Selectedplayerrow = row;
+                                SelectedPlayercol = column;
+                                highlightarr[row + 2][column - 2] = true;
+                                highlight++;
+                                //     Log.d("GreenCheck", "Blue mila " + players[row - 2][column - 2]);
+
+                            } else if (row > 1 && column > 0 && (players[row - 1][column - 1] == "player2" || players[row - 1][column - 1] == "player2king") && column != 1 && players[row - 2][column - 2] == null) {
+                                SelectedPlayer[row][column] = players[row][column];
+                                Selectedplayerrow = row;
+                                SelectedPlayercol = column;
+                                highlightarr[row - 2][column - 2] = true;
+                                highlight++;
+                                //     Log.d("GreenCheck", "Blue mila " + players[row - 2][column - 2]);
+
+                            }
+
 
                         }
 
 
                     }
 
-
                 }
+                //must blue
                 for (int i = 0; i < numbRows; i++) {
                     for (int j = 0; j < numbColumns; j++) {
-                        moveableplayer1[row][column] = null;
+                        moveable[row][column] = null;
 
                     }
                 }
                 comp = false;
             }
             Log.d("gubugubu", "" + movement);
-
-            //King movement player1
 
 
             //For movement
@@ -733,7 +998,7 @@ public class DraughtsView extends View {
 
 
                         } else if (row == Selectedplayerrow - 2 && column == SelectedPlayercol - 2) {
-                            if (players[Selectedplayerrow - 1][SelectedPlayercol - 1] == "player1" && players[Selectedplayerrow - 2][SelectedPlayercol - 2] == null) {
+                            if ((players[Selectedplayerrow - 1][SelectedPlayercol - 1] == "player1" || players[Selectedplayerrow - 1][SelectedPlayercol - 1] == "player1king") && players[Selectedplayerrow - 2][SelectedPlayercol - 2] == null) {
                                 players[Selectedplayerrow][SelectedPlayercol] = null;
                                 players[Selectedplayerrow - 2][SelectedPlayercol - 2] = "player2";
                                 players[Selectedplayerrow - 1][SelectedPlayercol - 1] = null;
@@ -741,11 +1006,11 @@ public class DraughtsView extends View {
                                 ///Chaining Working here/////////
                                 row = Selectedplayerrow - 2;
                                 column = SelectedPlayercol - 2;
-                                if (row > 1 && column > 1 && players[row - 1][column - 1] == "player1" && players[row - 2][column - 2] == null) {
+                                if (row > 1 && column > 1 && (players[row - 1][column - 1] == "player1" || players[row - 1][column - 1] == "player1king") && players[row - 2][column - 2] == null) {
                                     movement = 1;
                                     selectedmoveflag = false;
 
-                                } else if (row > 1 && column < 6 && players[row - 1][column + 1] == "player1" && players[row - 2][column + 2] == null) {
+                                } else if (row > 1 && column < 6 && (players[row - 1][column + 1] == "player1" || players[row - 1][column + 1] == "player1king") && players[row - 2][column + 2] == null) {
                                     movement = 1;
                                     selectedmoveflag = false;
 
@@ -778,18 +1043,18 @@ public class DraughtsView extends View {
                             }
 
                         } else if (row == Selectedplayerrow - 2 && column == SelectedPlayercol + 2) {
-                            if (players[Selectedplayerrow - 1][SelectedPlayercol + 1] == "player1" && players[Selectedplayerrow - 2][SelectedPlayercol + 2] == null) {
+                            if ((players[Selectedplayerrow - 1][SelectedPlayercol + 1] == "player1" || players[Selectedplayerrow - 1][SelectedPlayercol + 1] == "player1king") && players[Selectedplayerrow - 2][SelectedPlayercol + 2] == null) {
                                 players[Selectedplayerrow][SelectedPlayercol] = null;
                                 players[Selectedplayerrow - 2][SelectedPlayercol + 2] = "player2";
                                 players[Selectedplayerrow - 1][SelectedPlayercol + 1] = null;
 
                                 row = Selectedplayerrow - 2;
                                 column = SelectedPlayercol + 2;
-                                if (row > 1 && column < 6 && players[row - 1][column + 1] == "player1" && players[row - 2][column + 2] == null) {
+                                if (row > 1 && column < 6 && (players[row - 1][column + 1] == "player1" || players[row - 1][column + 1] == "player1king") && players[row - 2][column + 2] == null) {
                                     movement = 1;
                                     selectedmoveflag = false;
 
-                                } else if (row > 1 && column > 1 && players[row - 1][column - 1] == "player1" && players[row - 2][column - 2] == null) {
+                                } else if (row > 1 && column > 1 && (players[row - 1][column - 1] == "player1" || players[row - 1][column - 1] == "player1king") && players[row - 2][column - 2] == null) {
                                     movement = 1;
                                     selectedmoveflag = false;
 
@@ -822,7 +1087,6 @@ public class DraughtsView extends View {
                     //Green king movement
 
                     else if (players[Selectedplayerrow][SelectedPlayercol] == "player2king") {
-                        //Green Left movement
                         if (row == Selectedplayerrow + 1 && column == SelectedPlayercol - 1) {
                             if (players[Selectedplayerrow + 1][SelectedPlayercol - 1] == null) {
                                 players[Selectedplayerrow][SelectedPlayercol] = null;
@@ -836,20 +1100,66 @@ public class DraughtsView extends View {
                             selectedmoveflag = false;
 
 
+                        } else if (row == Selectedplayerrow - 1 && column == SelectedPlayercol - 1) {
+                            if (players[Selectedplayerrow - 1][SelectedPlayercol - 1] == null) {
+                                players[Selectedplayerrow][SelectedPlayercol] = null;
+                                players[Selectedplayerrow - 1][SelectedPlayercol - 1] = "player2king";
+                                Log.d("SelectedMOve", "Row :" + row + " Column:" + column + " status: " + SelectedPlayer[Selectedplayerrow][SelectedPlayercol]);
+                                selectedmoveflag = false;
+
+                                movement = 0;
+                            }
+
+                            selectedmoveflag = false;
+
+
                         } else if (row == Selectedplayerrow + 2 && column == SelectedPlayercol - 2) {
-                            if (players[Selectedplayerrow + 1][SelectedPlayercol - 1] == "player1" && players[Selectedplayerrow + 2][SelectedPlayercol - 2] == null) {
+                            if ((players[Selectedplayerrow + 1][SelectedPlayercol - 1] == "player1" || players[Selectedplayerrow + 1][SelectedPlayercol - 1] == "player1king") && players[Selectedplayerrow + 2][SelectedPlayercol - 2] == null) {
                                 players[Selectedplayerrow][SelectedPlayercol] = null;
                                 players[Selectedplayerrow + 2][SelectedPlayercol - 2] = "player2king";
                                 players[Selectedplayerrow + 1][SelectedPlayercol - 1] = null;
 
                                 ///Chaining Working here/////////
-                                row = Selectedplayerrow - 2;
+                                row = Selectedplayerrow + 2;
                                 column = SelectedPlayercol - 2;
-                                if (row > 1 && column > 1 && players[row + 1][column - 1] == "player1" && players[row + 2][column - 2] == null) {
+                                if (row < 7 && column > 1 && (players[row + 1][column - 1] == "player1" || players[row + 1][column - 1] == "player1king") && players[row + 2][column - 2] == null) {
                                     movement = 1;
                                     selectedmoveflag = false;
 
-                                } else if (row > 1 && column < 6 && players[row + 1][column + 1] == "player1" && players[row + 2][column + 2] == null) {
+                                } else if (row < 7 && column < 6 && (players[row + 1][column + 1] == "player1" || players[row + 1][column + 1] == "player1king") && players[row + 2][column + 2] == null) {
+                                    movement = 1;
+                                    selectedmoveflag = false;
+
+                                } else {
+                                    movement = 0;
+                                    selectedmoveflag = false;
+
+                                }
+
+
+                            } else {
+                                movement = 1;
+
+                                selectedmoveflag = false;
+
+                            }
+
+                        }
+                        //backward left green king capture
+                        else if (row == Selectedplayerrow - 2 && column == SelectedPlayercol - 2) {
+                            if ((players[Selectedplayerrow - 1][SelectedPlayercol - 1] == "player1" || players[Selectedplayerrow - 1][SelectedPlayercol - 1] == "player1king") && players[Selectedplayerrow - 2][SelectedPlayercol - 2] == null) {
+                                players[Selectedplayerrow][SelectedPlayercol] = null;
+                                players[Selectedplayerrow - 2][SelectedPlayercol - 2] = "player2king";
+                                players[Selectedplayerrow - 1][SelectedPlayercol - 1] = null;
+
+                                ///Chaining Working here/////////
+                                row = Selectedplayerrow - 2;
+                                column = SelectedPlayercol - 2;
+                                if (row > 1 && column > 1 && (players[row - 1][column - 1] == "player1" || players[row - 1][column - 1] == "player1king") && players[row - 2][column - 2] == null) {
+                                    movement = 1;
+                                    selectedmoveflag = false;
+
+                                } else if (row > 1 && column < 6 && (players[row - 1][column + 1] == "player1" || players[row - 1][column + 1] == "player1king") && players[row - 2][column + 2] == null) {
                                     movement = 1;
                                     selectedmoveflag = false;
 
@@ -881,19 +1191,67 @@ public class DraughtsView extends View {
 
                             }
 
-                        } else if (row == Selectedplayerrow + 2 && column == SelectedPlayercol + 2) {
-                            if (players[Selectedplayerrow + 1][SelectedPlayercol + 1] == "player1" && players[Selectedplayerrow + 2][SelectedPlayercol + 2] == null) {
+                        } else if (row == Selectedplayerrow - 1 && column == SelectedPlayercol + 1) {
+                            if (players[Selectedplayerrow - 1][SelectedPlayercol + 1] == null) {
+                                players[Selectedplayerrow][SelectedPlayercol] = null;
+                                players[Selectedplayerrow - 1][SelectedPlayercol + 1] = "player2king";
+
+                                Log.d("SelectedMOve", "Row :" + row + " Column:" + column + " status: " + SelectedPlayer[Selectedplayerrow][SelectedPlayercol]);
+                                selectedmoveflag = false;
+                                movement = 0;
+
+                            } else {
+                                selectedmoveflag = false;
+
+                            }
+
+                        }
+
+
+                        //forward right king capture
+                        else if (row == Selectedplayerrow + 2 && column == SelectedPlayercol + 2) {
+                            if ((players[Selectedplayerrow + 1][SelectedPlayercol + 1] == "player1" || players[Selectedplayerrow + 1][SelectedPlayercol + 1] == "player1king") && players[Selectedplayerrow + 2][SelectedPlayercol + 2] == null) {
                                 players[Selectedplayerrow][SelectedPlayercol] = null;
                                 players[Selectedplayerrow + 2][SelectedPlayercol + 2] = "player2king";
                                 players[Selectedplayerrow + 1][SelectedPlayercol + 1] = null;
 
-                                row = Selectedplayerrow - 2;
+                                row = Selectedplayerrow + 2;
                                 column = SelectedPlayercol + 2;
-                                if (row > 1 && column < 6 && players[row + 1][column + 1] == "player1" && players[row + 2][column + 2] == null) {
+                                if (row < 6 && column < 6 && (players[row + 1][column + 1] == "player1" || players[row + 1][column + 1] == "player1king") && players[row + 2][column + 2] == null) {
                                     movement = 1;
                                     selectedmoveflag = false;
 
-                                } else if (row > 1 && column > 1 && players[row + 1][column - 1] == "player1" && players[row + 2][column - 2] == null) {
+                                } else if (row < 6 && column > 1 && (players[row + 1][column - 1] == "player1" || players[row + 1][column - 1] == "player1king") && players[row + 2][column - 2] == null) {
+                                    movement = 1;
+                                    selectedmoveflag = false;
+
+                                } else {
+
+                                    movement = 0;
+                                    selectedmoveflag = false;
+
+                                }
+
+
+                                Log.d("SelectedMOve", "Row :" + row + " Column:" + column + " status: " + SelectedPlayer[Selectedplayerrow][SelectedPlayercol]);
+
+                            }
+
+                        }
+                        //reverse right king checkmate
+                        else if (row == Selectedplayerrow - 2 && column == SelectedPlayercol + 2) {
+                            if ((players[Selectedplayerrow - 1][SelectedPlayercol + 1] == "player1" || players[Selectedplayerrow - 1][SelectedPlayercol + 1] == "player1king") && players[Selectedplayerrow - 2][SelectedPlayercol + 2] == null) {
+                                players[Selectedplayerrow][SelectedPlayercol] = null;
+                                players[Selectedplayerrow - 2][SelectedPlayercol + 2] = "player2king";
+                                players[Selectedplayerrow - 1][SelectedPlayercol + 1] = null;
+
+                                row = Selectedplayerrow - 2;
+                                column = SelectedPlayercol + 2;
+                                if (row > 1 && column < 6 && (players[row - 1][column + 1] == "player1" || players[row - 1][column + 1] == "player1king") && players[row - 2][column + 2] == null) {
+                                    movement = 1;
+                                    selectedmoveflag = false;
+
+                                } else if (row > 1 && column > 1 && (players[row - 1][column - 1] == "player1" || players[row - 1][column - 1] == "player1king") && players[row - 2][column - 2] == null) {
                                     movement = 1;
                                     selectedmoveflag = false;
 
@@ -916,18 +1274,15 @@ public class DraughtsView extends View {
                             selectedmoveflag = false;
 
                         }
-                        if (row == 0) {
-                            //  players[row][column] = "player2king";
-                            //movement = 0;
 
-                        }
 
                     }
+
                 }
 
 
                 //Blue Movement
-
+/*
                 else if (movement == 0 && Selectedmove[row][column] == "move" && players[Selectedplayerrow][SelectedPlayercol] == "player1") {
                     if (row == Selectedplayerrow + 1 && column == SelectedPlayercol - 1) {
                         if (players[Selectedplayerrow + 1][SelectedPlayercol - 1] == null) {
@@ -942,7 +1297,7 @@ public class DraughtsView extends View {
 
 
                     } else if (row == Selectedplayerrow + 2 && column == SelectedPlayercol - 2) {
-                        if (players[Selectedplayerrow + 1][SelectedPlayercol - 1] == "player2" && players[Selectedplayerrow + 2][SelectedPlayercol - 2] == null) {
+                        if ((players[Selectedplayerrow + 1][SelectedPlayercol - 1] == "player2" || players[Selectedplayerrow + 1][SelectedPlayercol - 1] == "player2king") && players[Selectedplayerrow + 2][SelectedPlayercol - 2] == null) {
                             players[Selectedplayerrow][SelectedPlayercol] = null;
                             players[Selectedplayerrow + 2][SelectedPlayercol - 2] = "player1";
                             players[Selectedplayerrow + 1][SelectedPlayercol - 1] = null;
@@ -1033,9 +1388,318 @@ public class DraughtsView extends View {
                 }
 
 
-            } else {
+            }
+            */
+            }
+            //Blue movement
+            if (movement == 0 && Selectedmove[row][column] == "move") {
+
+                if (players[Selectedplayerrow][SelectedPlayercol] == "player1") {
+                    //Green Left movement
+                    if (row == Selectedplayerrow + 1 && column == SelectedPlayercol - 1) {
+                        if (players[Selectedplayerrow + 1][SelectedPlayercol - 1] == null) {
+                            players[Selectedplayerrow][SelectedPlayercol] = null;
+                            players[Selectedplayerrow + 1][SelectedPlayercol - 1] = "player1";
+                            //    Log.d("SelectedMOve", "Row :" + row + " Column:" + column + " status: " + SelectedPlayer[Selectedplayerrow][SelectedPlayercol]);
+                            selectedmoveflag = false;
+
+                            movement = 1;
+                        }
+
+                        selectedmoveflag = false;
+
+
+                    } else if (row == Selectedplayerrow + 2 && column == SelectedPlayercol - 2) {
+                        if ((players[Selectedplayerrow + 1][SelectedPlayercol - 1] == "player2" || players[Selectedplayerrow + 1][SelectedPlayercol - 1] == "player2king") && players[Selectedplayerrow + 2][SelectedPlayercol - 2] == null) {
+                            players[Selectedplayerrow][SelectedPlayercol] = null;
+                            players[Selectedplayerrow + 2][SelectedPlayercol - 2] = "player1";
+                            players[Selectedplayerrow + 1][SelectedPlayercol - 1] = null;
+
+                            ///Chaining Working here/////////
+                            row = Selectedplayerrow + 2;
+                            column = SelectedPlayercol - 2;
+                            if (row < 6 && column > 1 && (players[row + 1][column - 1] == "player2" || players[row + 1][column - 1] == "player2king") && players[row + 2][column - 2] == null) {
+                                movement = 0;
+                                selectedmoveflag = false;
+
+                            } else if (row < 6 && column < 6 && (players[row + 1][column + 1] == "player2" || players[row + 1][column + 1] == "player2king") && players[row + 2][column + 2] == null) {
+                                movement = 0;
+                                selectedmoveflag = false;
+
+                            } else {
+                                movement = 1;
+                                selectedmoveflag = false;
+
+                            }
+
+
+                        } else {
+                            movement = 0;
+
+                            selectedmoveflag = false;
+
+                        }
+
+                    } else if (row == Selectedplayerrow + 1 && column == SelectedPlayercol + 1) {
+                        if (players[Selectedplayerrow + 1][SelectedPlayercol + 1] == null) {
+                            players[Selectedplayerrow][SelectedPlayercol] = null;
+                            players[Selectedplayerrow + 1][SelectedPlayercol + 1] = "player1";
+
+                            // Log.d("SelectedMOve", "Row :" + row + " Column:" + column + " status: " + SelectedPlayer[Selectedplayerrow][SelectedPlayercol]);
+                            selectedmoveflag = false;
+                            movement = 1;
+
+                        } else {
+                            selectedmoveflag = false;
+
+                        }
+
+                    } else if (row == Selectedplayerrow + 2 && column == SelectedPlayercol + 2) {
+                        if ((players[Selectedplayerrow + 1][SelectedPlayercol + 1] == "player2" || players[Selectedplayerrow + 1][SelectedPlayercol + 1] == "player2king") && players[Selectedplayerrow + 2][SelectedPlayercol + 2] == null) {
+                            players[Selectedplayerrow][SelectedPlayercol] = null;
+                            players[Selectedplayerrow + 2][SelectedPlayercol + 2] = "player1";
+                            players[Selectedplayerrow + 1][SelectedPlayercol + 1] = null;
+
+                            row = Selectedplayerrow + 2;
+                            column = SelectedPlayercol + 2;
+                            if (row < 6 && column < 6 && (players[row + 1][column + 1] == "player2" || players[row + 1][column + 1] == "player2king") && players[row + 2][column + 2] == null) {
+                                movement = 0;
+                                selectedmoveflag = false;
+
+                            } else if (row < 6 && column > 1 && (players[row + 1][column - 1] == "player2" || players[row + 1][column - 1] == "player2king") && players[row + 2][column - 2] == null) {
+                                movement = 0;
+                                selectedmoveflag = false;
+
+                            } else {
+
+                                movement = 1;
+                                selectedmoveflag = false;
+
+                            }
+
+
+                            Log.d("SelectedMOve", "Row :" + row + " Column:" + column + " status: " + SelectedPlayer[Selectedplayerrow][SelectedPlayercol]);
+
+                        }
+
+                    } else {
+
+                        movement = 0;
+
+                        selectedmoveflag = false;
+
+                    }
+                    if (row == 7) {
+                        players[row][column] = "player1king";
+                        //movement = 0;
+
+                    }
+
+                }
+                //Blue king movement
+
+                else if (players[Selectedplayerrow][SelectedPlayercol] == "player1king") {
+                    if (row == Selectedplayerrow + 1 && column == SelectedPlayercol - 1) {
+                        if (players[Selectedplayerrow + 1][SelectedPlayercol - 1] == null) {
+                            players[Selectedplayerrow][SelectedPlayercol] = null;
+                            players[Selectedplayerrow + 1][SelectedPlayercol - 1] = "player1king";
+                            Log.d("SelectedMOve", "Row :" + row + " Column:" + column + " status: " + SelectedPlayer[Selectedplayerrow][SelectedPlayercol]);
+                            selectedmoveflag = false;
+
+                            movement = 1;
+                        }
+
+                        selectedmoveflag = false;
+
+
+                    } else if (row == Selectedplayerrow - 1 && column == SelectedPlayercol - 1) {
+                        if (players[Selectedplayerrow - 1][SelectedPlayercol - 1] == null) {
+                            players[Selectedplayerrow][SelectedPlayercol] = null;
+                            players[Selectedplayerrow - 1][SelectedPlayercol - 1] = "player1king";
+                            Log.d("SelectedMOve", "Row :" + row + " Column:" + column + " status: " + SelectedPlayer[Selectedplayerrow][SelectedPlayercol]);
+                            selectedmoveflag = false;
+
+                            movement = 1;
+                        }
+
+                        selectedmoveflag = false;
+
+
+                    } else if (row == Selectedplayerrow + 2 && column == SelectedPlayercol - 2) {
+                        if ((players[Selectedplayerrow + 1][SelectedPlayercol - 1] == "player2" || players[Selectedplayerrow + 1][SelectedPlayercol - 1] == "player2king") && players[Selectedplayerrow + 2][SelectedPlayercol - 2] == null) {
+                            players[Selectedplayerrow][SelectedPlayercol] = null;
+                            players[Selectedplayerrow + 2][SelectedPlayercol - 2] = "player1king";
+                            players[Selectedplayerrow + 1][SelectedPlayercol - 1] = null;
+
+                            ///Chaining Working here/////////
+                            row = Selectedplayerrow + 2;
+                            column = SelectedPlayercol - 2;
+                            if (row < 7 && column > 1 && (players[row + 1][column - 1] == "player2" || players[row + 1][column - 1] == "player2king") && players[row + 2][column - 2] == null) {
+                                movement = 0;
+                                selectedmoveflag = false;
+
+                            } else if (row < 7 && column < 6 && (players[row + 1][column + 1] == "player2" || players[row + 1][column + 1] == "player2king") && players[row + 2][column + 2] == null) {
+                                movement = 0;
+                                selectedmoveflag = false;
+
+                            } else {
+                                movement = 1;
+                                selectedmoveflag = false;
+
+                            }
+
+
+                        } else {
+                            movement = 0;
+
+                            selectedmoveflag = false;
+
+                        }
+
+                    }
+                    //backward left green king capture
+                    else if (row == Selectedplayerrow - 2 && column == SelectedPlayercol - 2) {
+                        if ((players[Selectedplayerrow - 1][SelectedPlayercol - 1] == "player2" || players[Selectedplayerrow - 1][SelectedPlayercol - 1] == "player2king") && players[Selectedplayerrow - 2][SelectedPlayercol - 2] == null) {
+                            players[Selectedplayerrow][SelectedPlayercol] = null;
+                            players[Selectedplayerrow - 2][SelectedPlayercol - 2] = "player1king";
+                            players[Selectedplayerrow - 1][SelectedPlayercol - 1] = null;
+
+                            ///Chaining Working here/////////
+                            row = Selectedplayerrow - 2;
+                            column = SelectedPlayercol - 2;
+                            if (row > 1 && column > 1 && (players[row - 1][column - 1] == "player2" || players[row - 1][column - 1] == "player2king") && players[row - 2][column - 2] == null) {
+                                movement = 0;
+                                selectedmoveflag = false;
+
+                            } else if (row > 1 && column < 6 && (players[row - 1][column + 1] == "player2" || players[row - 1][column + 1] == "player2king") && players[row - 2][column + 2] == null) {
+                                movement = 0;
+                                selectedmoveflag = false;
+
+                            } else {
+                                movement = 1;
+                                selectedmoveflag = false;
+
+                            }
+
+
+                        } else {
+                            movement = 0;
+
+                            selectedmoveflag = false;
+
+                        }
+
+                    } else if (row == Selectedplayerrow + 1 && column == SelectedPlayercol + 1) {
+                        if (players[Selectedplayerrow + 1][SelectedPlayercol + 1] == null) {
+                            players[Selectedplayerrow][SelectedPlayercol] = null;
+                            players[Selectedplayerrow + 1][SelectedPlayercol + 1] = "player1king";
+
+                            Log.d("SelectedMOve", "Row :" + row + " Column:" + column + " status: " + SelectedPlayer[Selectedplayerrow][SelectedPlayercol]);
+                            selectedmoveflag = false;
+                            movement = 1;
+
+                        } else {
+                            selectedmoveflag = false;
+
+                        }
+
+                    } else if (row == Selectedplayerrow - 1 && column == SelectedPlayercol + 1) {
+                        if (players[Selectedplayerrow - 1][SelectedPlayercol + 1] == null) {
+                            players[Selectedplayerrow][SelectedPlayercol] = null;
+                            players[Selectedplayerrow - 1][SelectedPlayercol + 1] = "player1king";
+
+                            Log.d("SelectedMOve", "Row :" + row + " Column:" + column + " status: " + SelectedPlayer[Selectedplayerrow][SelectedPlayercol]);
+                            selectedmoveflag = false;
+                            movement = 1;
+
+                        } else {
+                            selectedmoveflag = false;
+
+                        }
+
+                    }
+
+
+                    //forward right king capture
+                    else if (row == Selectedplayerrow + 2 && column == SelectedPlayercol + 2) {
+                        if ((players[Selectedplayerrow + 1][SelectedPlayercol + 1] == "player2" || players[Selectedplayerrow + 1][SelectedPlayercol + 1] == "player2king") && players[Selectedplayerrow + 2][SelectedPlayercol + 2] == null) {
+                            players[Selectedplayerrow][SelectedPlayercol] = null;
+                            players[Selectedplayerrow + 2][SelectedPlayercol + 2] = "player1king";
+                            players[Selectedplayerrow + 1][SelectedPlayercol + 1] = null;
+
+                            row = Selectedplayerrow + 2;
+                            column = SelectedPlayercol + 2;
+                            if (row < 6 && column < 6 && (players[row + 1][column + 1] == "player2" || players[row + 1][column + 1] == "player2king") && players[row + 2][column + 2] == null) {
+                                movement = 0;
+                                selectedmoveflag = false;
+
+                            } else if (row < 6 && column > 1 && (players[row + 1][column - 1] == "player2" || players[row + 1][column - 1] == "player2king") && players[row + 2][column - 2] == null) {
+                                movement = 0;
+                                selectedmoveflag = false;
+
+                            } else {
+
+                                movement = 1;
+                                selectedmoveflag = false;
+
+                            }
+
+
+                            Log.d("SelectedMOve", "Row :" + row + " Column:" + column + " status: " + SelectedPlayer[Selectedplayerrow][SelectedPlayercol]);
+
+                        }
+
+                    }
+                    //reverse right king checkmate
+                    else if (row == Selectedplayerrow - 2 && column == SelectedPlayercol + 2) {
+                        if (players[Selectedplayerrow - 1][SelectedPlayercol + 1] == "player2" && players[Selectedplayerrow - 2][SelectedPlayercol + 2] == null) {
+                            players[Selectedplayerrow][SelectedPlayercol] = null;
+                            players[Selectedplayerrow - 2][SelectedPlayercol + 2] = "player1king";
+                            players[Selectedplayerrow - 1][SelectedPlayercol + 1] = null;
+
+                            row = Selectedplayerrow - 2;
+                            column = SelectedPlayercol + 2;
+                            if (row > 1 && column < 6 && (players[row - 1][column + 1] == "player2" || players[row - 1][column + 1] == "player2king") && players[row - 2][column + 2] == null) {
+                                movement = 0;
+                                selectedmoveflag = false;
+
+                            } else if (row > 1 && column > 1 && (players[row - 1][column - 1] == "player2" || players[row - 1][column - 1] == "player2king") && players[row - 2][column - 2] == null) {
+                                movement = 0;
+                                selectedmoveflag = false;
+
+                            } else {
+
+                                movement = 1;
+                                selectedmoveflag = false;
+
+                            }
+
+
+                            Log.d("SelectedMOve", "Row :" + row + " Column:" + column + " status: " + SelectedPlayer[Selectedplayerrow][SelectedPlayercol]);
+
+                        }
+
+                    } else {
+
+                        movement = 0;
+
+                        selectedmoveflag = false;
+
+                    }
+
+
+                }
+
             }
 
+
+            //For clearing allowed moves
+            for (int i = 0; i < numbRows; i++) {
+                for (int k = 0; k < numbColumns; k++) {
+                    Selectedmove[i][k] = null;
+
+                }
+            }
 
             invalidate();
         }
