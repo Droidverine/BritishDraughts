@@ -1,5 +1,6 @@
 package com.droidverine.draughtsmd;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -9,6 +10,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
@@ -35,14 +37,22 @@ public class DraughtsView extends View {
     private String[][] Selectedmove;
     private String[][] SelectedPlayer;
     int Selectedplayerrow, SelectedPlayercol;
-    int init = 0;
+    int initialize;
     int height;
-
 
     public DraughtsView(Context context) {
         super(context);
         init(null);
 
+    }
+
+    public void reset(int init) {
+
+        initialize = init;
+        Log.d("initala", "" + init);
+        invalidate();
+
+        //init=this.init;
     }
 
     public DraughtsView(Context context, @Nullable AttributeSet attrs) {
@@ -171,7 +181,8 @@ public class DraughtsView extends View {
         }
 
         //player drawing
-        if (init == 0) {
+        if (initialize == 0) {
+            invalidate();
 
             canvas.translate(0, 0);
 
@@ -203,11 +214,11 @@ public class DraughtsView extends View {
 
             }
 
-            Log.d("init", "init =" + init);
-            init = 1;
+            Log.d("init", "init =" + initialize);
+            initialize = 1;
 
-        } else if (init == 1) {
-            Log.d("countinue", "init =" + init);
+        } else if (initialize == 1) {
+            Log.d("countinue", "init =" + initialize);
             for (int row = 0; row < numbRows; row++) {
                 for (int col = 0; col < numbColumns; col++) {
                     if (players[row][col] == "player1") {
@@ -327,12 +338,8 @@ public class DraughtsView extends View {
                                 cellHeight, (col + 1) * cellWidth, (row +
                                 1) * cellHeight, paint);
                         highlightarr[row][col] = false;
-                        allowedmove[row][col] = true;
                         players[row][col] = null;
                         Selectedmove[row][col] = "move";
-                        Log.d("allowed moves", "row: " + row + "col :" + col + " " + allowedmove[row][col]);
-
-
                         selectedmoveflag = true;
 
 
@@ -349,11 +356,30 @@ public class DraughtsView extends View {
 
     }
 
-    // Green player 2 == 1
+    //Green player 2 == 1
     //Blue player 1 ==0
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        int player1ct, player2ct;
+        player1ct = 0;
+        player2ct = 0;
+        for (int i = 0; i < numbRows; i++) {
+            for (int j = 0; j < numbColumns; j++) {
+                if (players[i][j] == "player1" || players[i][j] == "player1king") {
+                    player1ct++;
+                } else if (players[i][j] == "player2" || players[i][j] == "player2king") {
+                    player2ct++;
+                }
+            }
+        }
+
+        TextView txtViewpl1 = (TextView) ((Activity) getContext()).findViewById(R.id.player1score);
+        txtViewpl1.setText("Player 1: " + player2ct);
+        TextView txtViewpl2 = (TextView) ((Activity) getContext()).findViewById(R.id.player2score);
+        txtViewpl2.setText("Player 2: " + player1ct);
         Boolean comp = false;
+
+
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
 
 
@@ -445,15 +471,12 @@ public class DraughtsView extends View {
                             }
                         } else if (comp != true && moveable[row][column] != "must" && players[row][column] == "player2king") {
 
-                            if (row < 6 && column < 6 && players[row + 1][column + 1] == "player1" && players[row + 2][column + 2] == null) {
+                            if (row < 6 && column < 6 && (players[row + 1][column + 1] == "player1" || players[row + 1][column + 1] == "player1king") && players[row + 2][column + 2] == null) {
                                 SelectedPlayer[row][column] = players[row][column];
                                 Selectedplayerrow = row;
                                 SelectedPlayercol = column;
                                 highlightarr[row + 2][column + 2] = true;
-                                //   allowedmove[row+2][column+2]=true;
-
                                 highlight++;
-                                //  Log.d("King Check", "Blue mila " + players[row - 2][column + 2]);
 
 
                             } else {
@@ -463,7 +486,6 @@ public class DraughtsView extends View {
                                     SelectedPlayercol = column;
                                     highlightarr[row + 1][column + 1] = true;
                                     allowedmove[row + 1][column + 1] = true;
-
                                     highlight++;
 
                                 }
@@ -473,8 +495,6 @@ public class DraughtsView extends View {
                                 Selectedplayerrow = row;
                                 SelectedPlayercol = column;
                                 highlightarr[row - 2][column + 2] = true;
-                                //  allowedmove[row-2][column+2]=true;
-
                                 highlight++;
                                 Log.d("GreenCheck", "Blue mila " + players[row - 2][column + 2]);
 
@@ -485,8 +505,6 @@ public class DraughtsView extends View {
                                     Selectedplayerrow = row;
                                     SelectedPlayercol = column;
                                     highlightarr[row - 1][column + 1] = true;
-                                    //     allowedmove[row - 1][column + 1] = true;
-
                                     highlight++;
 
                                 }
@@ -587,7 +605,7 @@ public class DraughtsView extends View {
 
 ///////Green LEFT
 
-                            if (row > 1 && column > 0 && (players[row - 1][column - 1] == "player1" || players[row - 1][column - 1] == "player1") && column != 1 && players[row - 2][column - 2] == null) {
+                            if (row > 1 && column > 0 && (players[row - 1][column - 1] == "player1" || players[row - 1][column - 1] == "player1king") && column != 1 && players[row - 2][column - 2] == null) {
                                 SelectedPlayer[row][column] = players[row][column];
                                 Selectedplayerrow = row;
                                 SelectedPlayercol = column;
@@ -733,9 +751,8 @@ public class DraughtsView extends View {
                                 Selectedplayerrow = row;
                                 SelectedPlayercol = column;
                                 highlightarr[row + 2][column + 2] = true;
-                                //  allowedmove[row-2][column+2]=true;
                                 highlight++;
-                                //    Log.d("GreenCheck", "Blue mila " + players[row - 2][column + 2]);
+                                Log.d("GreenCheck", "Blue mila " + players[row + 2][column + 2]);
 
 
                             } else {
@@ -744,8 +761,6 @@ public class DraughtsView extends View {
                                     Selectedplayerrow = row;
                                     SelectedPlayercol = column;
                                     highlightarr[row + 1][column + 1] = true;
-                                    //  allowedmove[row-1][column+1]=true;
-
                                     highlight++;
 
                                 }
@@ -757,10 +772,8 @@ public class DraughtsView extends View {
                                 Selectedplayerrow = row;
                                 SelectedPlayercol = column;
                                 highlightarr[row + 2][column + 2] = true;
-                                //   allowedmove[row+2][column+2]=true;
-
                                 highlight++;
-                                Log.d("King Check", "Blue mila " + players[row - 2][column + 2]);
+                                Log.d("King Check", "Blue mila " + players[row + 2][column + 2]);
 
 
                             } else {
@@ -770,7 +783,6 @@ public class DraughtsView extends View {
                                     SelectedPlayercol = column;
                                     highlightarr[row + 1][column + 1] = true;
                                     allowedmove[row + 1][column + 1] = true;
-
                                     highlight++;
 
                                 }
@@ -780,20 +792,16 @@ public class DraughtsView extends View {
                                 Selectedplayerrow = row;
                                 SelectedPlayercol = column;
                                 highlightarr[row - 2][column + 2] = true;
-                                //  allowedmove[row-2][column+2]=true;
-
                                 highlight++;
-                                Log.d("GreenCheck", "Blue mila " + players[row - 2][column + 2]);
+                                Log.d("Bluecheck", "green mila " + players[row - 2][column + 2]);
 
 
                             } else {
-                                if (row > 1 && players[row - 1][column + 1] == null) {
+                                if (row > 0 && players[row - 1][column + 1] == null) {
                                     SelectedPlayer[row][column] = players[row][column];
                                     Selectedplayerrow = row;
                                     SelectedPlayercol = column;
                                     highlightarr[row - 1][column + 1] = true;
-                                    //     allowedmove[row - 1][column + 1] = true;
-
                                     highlight++;
 
                                 }
@@ -804,7 +812,7 @@ public class DraughtsView extends View {
                     }
                     if (column != 0) {
 
-///////Green LEFT
+///////Blue LEFT
                         if (players[row][column] == "player1") {
                             if (row < 7 && players[row + 1][column - 1] == null) {
                                 Log.d("BlueCheck", "Left check " + players[row + 1][column - 1]);
@@ -820,7 +828,7 @@ public class DraughtsView extends View {
                                 SelectedPlayercol = column;
                                 highlightarr[row + 2][column - 2] = true;
                                 highlight++;
-//                                Log.d("BlueCheck", "Blue mila " + players[row - 2][column - 2]);
+                                Log.d("BlueCheck", "Blue mila " + players[row + 2][column - 2]);
 
                             }
 
@@ -911,7 +919,7 @@ public class DraughtsView extends View {
                     } else if (comp == true && moveable[row][column] == "must" && players[row][column] == "player1king") {
                         if (column != 7) {
 
-///////Green Right
+///////Blue Right
 
                             if (row < 7 && column < 6 && (players[row + 1][column + 1] == "player2" || players[row + 1][column + 1] == "player2king") && players[row + 2][column + 2] == null) {
                                 SelectedPlayer[row][column] = players[row][column];
@@ -936,7 +944,7 @@ public class DraughtsView extends View {
                         }
                         if (column != 0) {
 
-///////Green LEFT
+///////Blue LEFT
 
                             if (row < 7 && column > 0 && (players[row + 1][column - 1] == "player2" || players[row + 1][column - 1] == "player2king") && column != 1 && players[row + 2][column - 2] == null) {
                                 SelectedPlayer[row][column] = players[row][column];
