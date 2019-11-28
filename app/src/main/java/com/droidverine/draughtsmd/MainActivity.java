@@ -3,12 +3,16 @@ package com.droidverine.draughtsmd;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.media.audiofx.Equalizer;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     int player1=0;
@@ -57,4 +61,31 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menuoptions,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.menureset:
+                Toast.makeText(getApplicationContext(),"Reset",Toast.LENGTH_LONG).show();
+                finish();
+                Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.menusettings:
+                Toast.makeText(getApplicationContext(),"Settings",Toast.LENGTH_LONG).show();
+                Intent intentm = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intentm);
+                break;
+            case R.id.menuexit:
+                Toast.makeText(getApplicationContext(),"Exit",Toast.LENGTH_LONG).show();
+                break;
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }

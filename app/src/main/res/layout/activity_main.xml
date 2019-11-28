@@ -2,48 +2,21 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     tools:context=".MainActivity"
     android:orientation="vertical"
-    android:layout_gravity="center">
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Life count "
-        android:textSize="28dp"
-        android:textStyle="bold"
-        android:layout_gravity="center"/>
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_gravity="center">
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="26dp"
-        android:padding="16dp"
-        android:layout_margin="8dp"
-        android:id="@+id/player1score"
-        android:text="Player 1 : 12"
-        android:textStyle="bold"
+    >
+    <include layout="@layout/scoreboard"
+
         />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="26dp"
-            android:padding="16dp"
-            android:layout_margin="8dp"
-            android:id="@+id/player2score"
-            android:textStyle="bold"
-            android:text="Player 2 : 12"/>
-    </LinearLayout>
 
 
     <com.droidverine.draughtsmd.DraughtsView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="00dp"
+        android:layout_weight="3"
+        android:layout_gravity="center"
         android:id="@+id/draughts"
 
      />
@@ -53,7 +26,8 @@
         android:id="@+id/resetbtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Reset"/>
+        android:text="Reset"
+        android:visibility="gone"/>
 
 
 </LinearLayout>

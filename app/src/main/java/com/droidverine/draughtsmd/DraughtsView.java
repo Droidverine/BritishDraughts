@@ -2,6 +2,7 @@ package com.droidverine.draughtsmd;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -21,6 +22,9 @@ public class DraughtsView extends View {
     int numbRows;
     int numbColumns;
     Paint paint;
+    Paint player1pawn;
+    Paint player2pawn;
+    SharedPreferences sharedPreferences;
     int width;
     int numberofwhitedraughts;
     private boolean[][] cellChecked;
@@ -69,16 +73,49 @@ public class DraughtsView extends View {
 
     private void init(@Nullable AttributeSet attrs) {
         //Initialize players
+         sharedPreferences= getContext().getSharedPreferences("draughts",0);
+        SharedPreferences.Editor editor=sharedPreferences.edit();
+
+
+        String player1color = sharedPreferences.getString("player1", null);
+
+        String player2color = sharedPreferences.getString("player2", null);
+
         paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         numbColumns = 8;
         numbRows = 8;
         numberofwhitedraughts = 12;
         highlightarr = new boolean[numbRows][numbColumns];
         allowedmove = new boolean[numbRows][numbColumns];
-
         players = new String[numbRows][numbColumns];
         Selectedmove = new String[numbRows][numbColumns];
         SelectedPlayer = new String[numbRows][numbColumns];
+        //player color set
+        player1pawn = new Paint(Paint.ANTI_ALIAS_FLAG);
+        player2pawn = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+       // player1pawn.setColor(Color.BLUE);
+        if(player1color==null)
+        {
+            player1pawn.setColor(Color.parseColor("#0000ff"));
+
+        }
+        else {
+            player1pawn.setColor(Color.parseColor(player1color));
+
+        }
+        if(player2color==null)
+        {
+
+            player2pawn.setColor(Color.parseColor("#00ff00"));
+        }
+        else {
+            player2pawn.setColor(Color.parseColor(player2color));
+
+        }
+
+//        player2pawn.setColor(Color.GREEN);
+
         players[0][0] = "player1";
         players[0][2] = "player1";
         players[0][4] = "player1";
@@ -132,6 +169,29 @@ public class DraughtsView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        String player1color = sharedPreferences.getString("player1", null);
+
+        String player2color = sharedPreferences.getString("player2", null);
+
+        // player1pawn.setColor(Color.BLUE);
+        if(player1color==null)
+        {
+            player1pawn.setColor(Color.parseColor("#0000ff"));
+
+        }
+        else {
+            player1pawn.setColor(Color.parseColor(player2color));
+
+        }
+        if(player2color==null)
+        {
+
+            player2pawn.setColor(Color.parseColor("#00ff00"));
+        }
+        else {
+            player2pawn.setColor(Color.parseColor(player1color));
+
+        }
 
         cellHeight = width / numbRows;
         cellWidth = height / numbColumns;
@@ -194,10 +254,10 @@ public class DraughtsView extends View {
                         RectF rect = new RectF(col * cellHeight, row * cellHeight,
                                 (col + 1) * cellWidth, (row +
                                 1) * cellHeight);
-                        //  players[row][col] = "white";
-                        paint.setColor(Color.BLUE);
 
-                        canvas.drawOval(rect, paint);
+//                        paint.setColor(Color.BLUE);
+
+                        canvas.drawOval(rect, player1pawn);
                     } else if (players[row][col] == "player2") {
 
 
@@ -207,7 +267,7 @@ public class DraughtsView extends View {
                         //  players[row][col] = "white";
                         paint.setColor(Color.GREEN);
 
-                        canvas.drawOval(rect, paint);
+                        canvas.drawOval(rect, player2pawn);
                     }
                     Log.d("Players", " row " + row + " col:" + col + " " + players[row][col]);
                 }
@@ -231,7 +291,7 @@ public class DraughtsView extends View {
                         paint.setColor(Color.BLUE);
 
 
-                        canvas.drawOval(rect, paint);
+                        canvas.drawOval(rect, player1pawn);
 
                     }
                     //King color Logic//
@@ -250,7 +310,7 @@ public class DraughtsView extends View {
 
 
 */
-                        canvas.drawOval(rect, paint);
+                        canvas.drawOval(rect, player2pawn);
                         // canvas.translate(col*cellHeight,row*cellHeight);
                         //Paint paint1 = new Paint(Paint.ANTI_ALIAS_FLAG);
                         paint.setColor(Color.WHITE);
@@ -290,7 +350,7 @@ public class DraughtsView extends View {
 
 
 */
-                        canvas.drawOval(rect, paint);
+                        canvas.drawOval(rect, player1pawn);
 
                         paint.setColor(Color.WHITE);
                         paint.setColor(Color.RED);
@@ -319,7 +379,7 @@ public class DraughtsView extends View {
                         //  players[row][col] = "white";
                         paint.setColor(Color.GREEN);
 
-                        canvas.drawOval(rect, paint);
+                        canvas.drawOval(rect, player2pawn);
                     }
                     Log.d("Players", " row " + row + " col:" + col + " " + players[row][col]);
                 }
@@ -355,9 +415,11 @@ public class DraughtsView extends View {
 
 
     }
-
+    /* NOTE THIS COMMENTS:
     //Green player 2 == 1
     //Blue player 1 ==0
+
+     */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int player1ct, player2ct;
@@ -373,10 +435,16 @@ public class DraughtsView extends View {
             }
         }
 
-        TextView txtViewpl1 = (TextView) ((Activity) getContext()).findViewById(R.id.player1score);
-        txtViewpl1.setText("Player 1: " + player2ct);
-        TextView txtViewpl2 = (TextView) ((Activity) getContext()).findViewById(R.id.player2score);
-        txtViewpl2.setText("Player 2: " + player1ct);
+        TextView txtViewpl1 = (TextView) ((Activity) getContext()).findViewById(R.id.player2score);
+        int player1color=player1pawn.getColor();
+        int player2color=player2pawn.getColor();
+
+        txtViewpl1.setText("Player 2\n"+ player1ct);
+        txtViewpl1.setTextColor(player1color);
+        TextView txtViewpl2 = (TextView) ((Activity) getContext()).findViewById(R.id.player1score);
+        txtViewpl2.setText("Player 1\n" + player2ct);
+        txtViewpl2.setTextColor(player2color);
+
         Boolean comp = false;
 
 
