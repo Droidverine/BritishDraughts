@@ -22,9 +22,12 @@ public class DraughtsView extends View {
     int numbRows;
     int numbColumns;
     Paint paint;
+    Paint tile1;
+    Paint tile2;
     Paint player1pawn;
     Paint player2pawn;
     SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
     int width;
     int numberofwhitedraughts;
     private boolean[][] cellChecked;
@@ -43,7 +46,8 @@ public class DraughtsView extends View {
     int Selectedplayerrow, SelectedPlayercol;
     int initialize;
     int height;
-
+    TextView txtViewpl1;
+    TextView txtViewpl2;
     public DraughtsView(Context context) {
         super(context);
         init(null);
@@ -56,7 +60,6 @@ public class DraughtsView extends View {
         Log.d("initala", "" + init);
         invalidate();
 
-        //init=this.init;
     }
 
     public DraughtsView(Context context, @Nullable AttributeSet attrs) {
@@ -73,14 +76,39 @@ public class DraughtsView extends View {
 
     private void init(@Nullable AttributeSet attrs) {
         //Initialize players
-         sharedPreferences= getContext().getSharedPreferences("draughts",0);
+        sharedPreferences= getContext().getSharedPreferences("draughts",0);
         SharedPreferences.Editor editor=sharedPreferences.edit();
 
 
         String player1color = sharedPreferences.getString("player1", null);
+        if(player1color==null)
+        {
+            editor.putString("player1","#00ff00");
+            editor.commit();
 
+        }
         String player2color = sharedPreferences.getString("player2", null);
+        if(player2color==null)
+        {
+            editor.putString("player2","#0000ff");
+            editor.commit();
 
+        }
+        String tile1color = sharedPreferences.getString("tile1", null);
+        if(tile1color==null)
+        {
+            editor.putString("tile1","#ffffff");
+            editor.commit();
+
+        }
+        String tile2color = sharedPreferences.getString("tile2", null);
+        if(tile2color==null)
+        {
+            editor.putString("tile2","#000000");
+            editor.commit();
+
+
+        }
         paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         numbColumns = 8;
         numbRows = 8;
@@ -93,6 +121,8 @@ public class DraughtsView extends View {
         //player color set
         player1pawn = new Paint(Paint.ANTI_ALIAS_FLAG);
         player2pawn = new Paint(Paint.ANTI_ALIAS_FLAG);
+        tile1=new Paint(Paint.ANTI_ALIAS_FLAG);
+        tile2=new Paint(Paint.ANTI_ALIAS_FLAG);
 
        // player1pawn.setColor(Color.BLUE);
         if(player1color==null)
@@ -111,6 +141,26 @@ public class DraughtsView extends View {
         }
         else {
             player2pawn.setColor(Color.parseColor(player2color));
+
+        }
+
+        //
+        if(tile1color==null)
+        {
+            tile1.setColor(Color.parseColor("#ffffff"));
+
+        }
+        else {
+            tile1.setColor(Color.parseColor(tile1color));
+
+        }
+        if(tile2color==null)
+        {
+
+            tile2.setColor(Color.parseColor("#000000"));
+        }
+        else {
+            tile2.setColor(Color.parseColor(tile2color));
 
         }
 
@@ -169,27 +219,85 @@ public class DraughtsView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+
+
+
+        TextView txtViewpl1 = (TextView) ((Activity) getContext()).findViewById(R.id.player2score);
+        TextView txtViewpl2 = (TextView) ((Activity) getContext()).findViewById(R.id.player1score);
         String player1color = sharedPreferences.getString("player1", null);
 
         String player2color = sharedPreferences.getString("player2", null);
 
         // player1pawn.setColor(Color.BLUE);
-        if(player1color==null)
+        if(player2color!=null)
         {
+            player1pawn.setColor(Color.parseColor(player2color));
+            txtViewpl1.setTextColor(Color.parseColor(player2color));
+
+
+        }
+        else {
             player1pawn.setColor(Color.parseColor("#0000ff"));
 
         }
-        else {
-            player1pawn.setColor(Color.parseColor(player2color));
-
-        }
-        if(player2color==null)
+        if(player1color!=null)
         {
+            player2pawn.setColor(Color.parseColor(player1color));
+            txtViewpl2.setTextColor(Color.parseColor(player1color));
 
-            player2pawn.setColor(Color.parseColor("#00ff00"));
         }
         else {
-            player2pawn.setColor(Color.parseColor(player1color));
+            player2pawn.setColor(Color.parseColor("#00ff00"));
+
+
+        }
+
+        //
+        String tile1color = sharedPreferences.getString("tile1", null);
+
+        String tile2color = sharedPreferences.getString("tile2", null);
+
+        // player1pawn.setColor(Color.BLUE);
+        if(tile1color!=null)
+        {
+            tile1.setColor(Color.parseColor(tile1color));
+
+
+        }
+        else {
+            tile1.setColor(Color.parseColor("#ffffff"));
+
+        }
+        if(tile2color!=null)
+        {
+            tile2.setColor(Color.parseColor(tile2color));
+
+        }
+        else {
+            tile2.setColor(Color.parseColor("#000000"));
+
+
+        }
+
+
+        TextView turntxt = (TextView) ((Activity) getContext()).findViewById(R.id.playerturn);
+
+        if(movement == 1)
+        {
+            turntxt.setText("Player 1 turn");
+            if(player1color!=null)
+            {
+                turntxt.setTextColor(Color.parseColor(player1color));
+
+            }
+
+        }else if(movement == 0)
+        {
+            turntxt.setText("Player 2 turn");
+            if(player2color!=null)
+            {
+                turntxt.setTextColor(Color.parseColor(player2color));
+            }
 
         }
 
@@ -205,33 +313,33 @@ public class DraughtsView extends View {
 
                     if (col % 2 == 0) {
                         if (row % 2 == 0) {
-                            paint.setColor(Color.WHITE);
+                        //    paint.setColor(Color.WHITE);
                             canvas.drawRect(col * cellWidth, row *
                                     cellHeight, (col + 1) * cellWidth, (row +
-                                    1) * cellHeight, paint);
+                                    1) * cellHeight, tile1);
 
 
                         } else {
-                            paint.setColor(Color.BLACK);
+                          //  paint.setColor(Color.BLACK);
                             canvas.drawRect(col * cellWidth, row *
                                     cellHeight, (col + 1) * cellWidth, (row +
-                                    1) * cellHeight, paint);
+                                    1) * cellHeight, tile2);
 
 
                         }
                     } else {
                         if (row % 2 == 0) {
-                            paint.setColor(Color.BLACK);
+                          //  paint.setColor(Color.BLACK);
                             canvas.drawRect(col * cellWidth, row *
                                     cellHeight, (col + 1) * cellWidth, (row +
-                                    1) * cellHeight, paint);
+                                    1) * cellHeight, tile2);
 
 
                         } else {
-                            paint.setColor(Color.WHITE);
+                         //   paint.setColor(Color.WHITE);
                             canvas.drawRect(col * cellWidth, row *
                                     cellHeight, (col + 1) * cellWidth, (row +
-                                    1) * cellHeight, paint);
+                                    1) * cellHeight, tile1);
 
                         }
                     }
@@ -243,7 +351,20 @@ public class DraughtsView extends View {
         //player drawing
         if (initialize == 0) {
             invalidate();
+             txtViewpl1 = (TextView) ((Activity) getContext()).findViewById(R.id.player2score);
+            txtViewpl1.setText("Player 2\n"+ "12");
+            if(player2color!=null)
+            {
+                txtViewpl1.setTextColor(Color.parseColor(player2color));
 
+            }
+             txtViewpl2 = (TextView) ((Activity) getContext()).findViewById(R.id.player1score);
+            txtViewpl2.setText("Player 1\n" + "12");
+            if(player1color!=null)
+            {
+                txtViewpl2.setTextColor(Color.parseColor(player1color));
+
+            }
             canvas.translate(0, 0);
 
             for (int row = 0; row < numbRows; row++) {
@@ -255,7 +376,6 @@ public class DraughtsView extends View {
                                 (col + 1) * cellWidth, (row +
                                 1) * cellHeight);
 
-//                        paint.setColor(Color.BLUE);
 
                         canvas.drawOval(rect, player1pawn);
                     } else if (players[row][col] == "player2") {
@@ -264,8 +384,6 @@ public class DraughtsView extends View {
                         RectF rect = new RectF(col * cellHeight, row * cellHeight,
                                 (col + 1) * cellWidth, (row +
                                 1) * cellHeight);
-                        //  players[row][col] = "white";
-                        paint.setColor(Color.GREEN);
 
                         canvas.drawOval(rect, player2pawn);
                     }
@@ -287,8 +405,6 @@ public class DraughtsView extends View {
                         RectF rect = new RectF(col * cellHeight, row * cellHeight,
                                 (col + 1) * cellWidth, (row +
                                 1) * cellHeight);
-                        //  players[row][col] = "white";
-                        paint.setColor(Color.BLUE);
 
 
                         canvas.drawOval(rect, player1pawn);
@@ -300,16 +416,8 @@ public class DraughtsView extends View {
                         RectF rect = new RectF(col * cellHeight, row * cellHeight,
                                 (col + 1) * cellWidth, (row +
                                 1) * cellHeight);
-                        paint.setColor(Color.GREEN);
-
-                        //  players[row][col] = "white";
-/*
-                        RectF rect1 = new RectF(col * (cellHeight+5), row * (cellHeight+5),
-                                (col+0.5f) * cellWidth, (row+0.5f) * cellHeight);
-                        paint.setColor(Color.BLUE);
 
 
-*/
                         canvas.drawOval(rect, player2pawn);
                         // canvas.translate(col*cellHeight,row*cellHeight);
                         //Paint paint1 = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -340,16 +448,7 @@ public class DraughtsView extends View {
                         RectF rect = new RectF(col * cellHeight, row * cellHeight,
                                 (col + 1) * cellWidth, (row +
                                 1) * cellHeight);
-                        paint.setColor(Color.BLUE);
 
-                        //  players[row][col] = "white";
-/*
-                        RectF rect1 = new RectF(col * (cellHeight+5), row * (cellHeight+5),
-                                (col+0.5f) * cellWidth, (row+0.5f) * cellHeight);
-                        paint.setColor(Color.BLUE);
-
-
-*/
                         canvas.drawOval(rect, player1pawn);
 
                         paint.setColor(Color.WHITE);
@@ -435,13 +534,13 @@ public class DraughtsView extends View {
             }
         }
 
-        TextView txtViewpl1 = (TextView) ((Activity) getContext()).findViewById(R.id.player2score);
+         txtViewpl1 = (TextView) ((Activity) getContext()).findViewById(R.id.player2score);
         int player1color=player1pawn.getColor();
         int player2color=player2pawn.getColor();
 
         txtViewpl1.setText("Player 2\n"+ player1ct);
         txtViewpl1.setTextColor(player1color);
-        TextView txtViewpl2 = (TextView) ((Activity) getContext()).findViewById(R.id.player1score);
+         txtViewpl2 = (TextView) ((Activity) getContext()).findViewById(R.id.player1score);
         txtViewpl2.setText("Player 1\n" + player2ct);
         txtViewpl2.setTextColor(player2color);
 
@@ -454,7 +553,7 @@ public class DraughtsView extends View {
             int column = (int) (event.getX() / cellWidth);
             int row = (int) (event.getY() / cellHeight);
 
-            // to check player2s & force move
+            // to check player2 & force move
             //need to set player movemable or note
             if (movement == 1) {
                 for (int i = 0; i < numbRows; i++) {
@@ -752,7 +851,7 @@ public class DraughtsView extends View {
 
             }
 
-// To check Blue & force move
+// To check Player1 & force move
             //need to set player movemable or note
             else if (movement == 0) {
                 Log.d("BLue bhetla", "player1");
@@ -1055,7 +1154,7 @@ public class DraughtsView extends View {
 
             if (selectedmoveflag) {
 
-                //Green Movement
+                //Player2  Movement
                 if (movement == 1 && Selectedmove[row][column] == "move") {
 
                     if (players[Selectedplayerrow][SelectedPlayercol] == "player2") {
@@ -1356,118 +1455,8 @@ public class DraughtsView extends View {
 
                 }
 
-
-                //Blue Movement
-/*
-                else if (movement == 0 && Selectedmove[row][column] == "move" && players[Selectedplayerrow][SelectedPlayercol] == "player1") {
-                    if (row == Selectedplayerrow + 1 && column == SelectedPlayercol - 1) {
-                        if (players[Selectedplayerrow + 1][SelectedPlayercol - 1] == null) {
-                            players[Selectedplayerrow][SelectedPlayercol] = null;
-                            players[Selectedplayerrow + 1][SelectedPlayercol - 1] = "player1";
-                            Log.d("SelectedMOve", "Row :" + row + " Column:" + column + " status: " + SelectedPlayer[Selectedplayerrow][SelectedPlayercol]);
-                            selectedmoveflag = false;
-                            movement = 1;
-                        } else {
-                            selectedmoveflag = false;
-                        }
-
-
-                    } else if (row == Selectedplayerrow + 2 && column == SelectedPlayercol - 2) {
-                        if ((players[Selectedplayerrow + 1][SelectedPlayercol - 1] == "player2" || players[Selectedplayerrow + 1][SelectedPlayercol - 1] == "player2king") && players[Selectedplayerrow + 2][SelectedPlayercol - 2] == null) {
-                            players[Selectedplayerrow][SelectedPlayercol] = null;
-                            players[Selectedplayerrow + 2][SelectedPlayercol - 2] = "player1";
-                            players[Selectedplayerrow + 1][SelectedPlayercol - 1] = null;
-                            Log.d("SelectedMOve", "Row :" + row + " Column:" + column + " status: " + SelectedPlayer[Selectedplayerrow][SelectedPlayercol]);
-                            row = Selectedplayerrow + 2;
-                            column = SelectedPlayercol - 2;
-                            if (row < 6 && column > 1 && (players[row + 1][column - 1] == "player2" || players[row + 1][column - 1] == "player2king") && players[row + 2][column - 2] == null) {
-                                movement = 0;
-                                selectedmoveflag = false;
-
-                            } else if (row < 6 && column < 6 && (players[row + 1][column + 1] == "player2" || players[row + 1][column + 1] == "player2king") && players[row + 2][column + 2] == null) {
-                                movement = 0;
-                                selectedmoveflag = false;
-
-                            } else {
-
-                                movement = 1;
-                                selectedmoveflag = false;
-
-                            }
-
-
-                        } else {
-                            selectedmoveflag = false;
-
-                        }
-
-
-                    } else if (row == Selectedplayerrow + 2 && column == SelectedPlayercol + 2) {
-                        if ((players[Selectedplayerrow + 1][SelectedPlayercol + 1] == "player2" || players[Selectedplayerrow + 1][SelectedPlayercol + 1] == "player2king") && players[Selectedplayerrow + 2][SelectedPlayercol + 2] == null) {
-                            players[Selectedplayerrow][SelectedPlayercol] = null;
-                            players[Selectedplayerrow + 2][SelectedPlayercol + 2] = "player1";
-                            players[Selectedplayerrow + 1][SelectedPlayercol + 1] = null;
-
-                            Log.d("SelectedMOve", "Row :" + row + " Column:" + column + " status: " + SelectedPlayer[Selectedplayerrow][SelectedPlayercol]);
-                            // selectedmoveflag = false;
-                            //movement = 1;
-                            row = Selectedplayerrow + 2;
-                            column = SelectedPlayercol + 2;
-                            if (row < 6 && column < 6 && players[row + 1][column + 1] == "player2" && players[row + 2][column + 2] == null) {
-                                movement = 0;
-                                selectedmoveflag = false;
-
-                            } else if (row < 6 && column > 1 && players[row + 1][column - 1] == "player2" && players[row + 2][column - 2] == null) {
-                                movement = 0;
-                                selectedmoveflag = false;
-                            } else {
-
-                                movement = 1;
-                                selectedmoveflag = false;
-
-                            }
-
-                        } else {
-                            movement = 1;
-
-                            selectedmoveflag = false;
-
-                            //  selectedmoveflag = false;
-
-                        }
-                    } else if (row == Selectedplayerrow + 1 && column == SelectedPlayercol + 1) {
-                        if (players[Selectedplayerrow + 1][SelectedPlayercol + 1] == null) {
-                            players[Selectedplayerrow][SelectedPlayercol] = null;
-                            players[Selectedplayerrow + 1][SelectedPlayercol + 1] = "player1";
-                            Log.d("SelectedMOve", "Row :" + row + " Column:" + column + " status: " + SelectedPlayer[Selectedplayerrow][SelectedPlayercol]);
-                            selectedmoveflag = false;
-                            movement = 1;
-
-                        } else {
-                            selectedmoveflag = false;
-
-                        }
-
-
-                    } else {
-                        selectedmoveflag = false;
-
-                    }
-                    //Make player 1 king
-                    if (row == 7) {
-                        players[row][column] = "player1king";
-                    }
-                } else {
-
-                    selectedmoveflag = false;
-
-                }
-
-
             }
-            */
-            }
-            //Blue movement
+            //Player1 movement
             if (movement == 0 && Selectedmove[row][column] == "move") {
 
                 if (players[Selectedplayerrow][SelectedPlayercol] == "player1") {
@@ -1728,7 +1717,7 @@ public class DraughtsView extends View {
                     }
                     //reverse right king checkmate
                     else if (row == Selectedplayerrow - 2 && column == SelectedPlayercol + 2) {
-                        if (players[Selectedplayerrow - 1][SelectedPlayercol + 1] == "player2" && players[Selectedplayerrow - 2][SelectedPlayercol + 2] == null) {
+                        if ((players[Selectedplayerrow - 1][SelectedPlayercol + 1] == "player2"|| players[Selectedplayerrow - 1][SelectedPlayercol + 1] == "player2king") && players[Selectedplayerrow - 2][SelectedPlayercol + 2] == null) {
                             players[Selectedplayerrow][SelectedPlayercol] = null;
                             players[Selectedplayerrow - 2][SelectedPlayercol + 2] = "player1king";
                             players[Selectedplayerrow - 1][SelectedPlayercol + 1] = null;
