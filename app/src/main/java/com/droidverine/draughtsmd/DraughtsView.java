@@ -26,6 +26,7 @@ public class DraughtsView extends View {
     Paint tile2;
     Paint player1pawn;
     Paint player2pawn;
+    boolean chainb;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
     int width;
@@ -283,8 +284,13 @@ public class DraughtsView extends View {
         TextView turntxt = (TextView) ((Activity) getContext()).findViewById(R.id.playerturn);
 
         if(movement == 1)
+        {   if(chainb!=true)
         {
             turntxt.setText("Player 1 turn");
+        }else{
+            turntxt.setText("Player 1 Chain turn");
+
+        }
             if(player1color!=null)
             {
                 turntxt.setTextColor(Color.parseColor(player1color));
@@ -292,8 +298,13 @@ public class DraughtsView extends View {
             }
 
         }else if(movement == 0)
+        {   if(chainb!=true)
         {
             turntxt.setText("Player 2 turn");
+        }else {
+            turntxt.setText("Player 2 Chain turn");
+
+        }
             if(player2color!=null)
             {
                 turntxt.setTextColor(Color.parseColor(player2color));
@@ -1165,6 +1176,7 @@ public class DraughtsView extends View {
                                 players[Selectedplayerrow - 1][SelectedPlayercol - 1] = "player2";
                                 Log.d("SelectedMOve", "Row :" + row + " Column:" + column + " status: " + SelectedPlayer[Selectedplayerrow][SelectedPlayercol]);
                                 selectedmoveflag = false;
+                                chainb=false;
 
                                 movement = 0;
                             }
@@ -1184,14 +1196,19 @@ public class DraughtsView extends View {
                                 if (row > 1 && column > 1 && (players[row - 1][column - 1] == "player1" || players[row - 1][column - 1] == "player1king") && players[row - 2][column - 2] == null) {
                                     movement = 1;
                                     selectedmoveflag = false;
+                                    chainb=true;
+
 
                                 } else if (row > 1 && column < 6 && (players[row - 1][column + 1] == "player1" || players[row - 1][column + 1] == "player1king") && players[row - 2][column + 2] == null) {
                                     movement = 1;
                                     selectedmoveflag = false;
+                                    chainb=true;
+
 
                                 } else {
                                     movement = 0;
                                     selectedmoveflag = false;
+                                    chainb=false;
 
                                 }
 
@@ -1200,6 +1217,7 @@ public class DraughtsView extends View {
                                 movement = 1;
 
                                 selectedmoveflag = false;
+                                //chainb=false;
 
                             }
 
@@ -1211,6 +1229,7 @@ public class DraughtsView extends View {
                                 Log.d("SelectedMOve", "Row :" + row + " Column:" + column + " status: " + SelectedPlayer[Selectedplayerrow][SelectedPlayercol]);
                                 selectedmoveflag = false;
                                 movement = 0;
+                                chainb=false;
 
                             } else {
                                 selectedmoveflag = false;
@@ -1228,15 +1247,21 @@ public class DraughtsView extends View {
                                 if (row > 1 && column < 6 && (players[row - 1][column + 1] == "player1" || players[row - 1][column + 1] == "player1king") && players[row - 2][column + 2] == null) {
                                     movement = 1;
                                     selectedmoveflag = false;
+                                    chainb=true;
+
 
                                 } else if (row > 1 && column > 1 && (players[row - 1][column - 1] == "player1" || players[row - 1][column - 1] == "player1king") && players[row - 2][column - 2] == null) {
                                     movement = 1;
                                     selectedmoveflag = false;
+                                    chainb=true;
+
 
                                 } else {
 
                                     movement = 0;
                                     selectedmoveflag = false;
+                                    chainb=false;
+
 
                                 }
 
@@ -1268,6 +1293,7 @@ public class DraughtsView extends View {
                                 players[Selectedplayerrow + 1][SelectedPlayercol - 1] = "player2king";
                                 Log.d("SelectedMOve", "Row :" + row + " Column:" + column + " status: " + SelectedPlayer[Selectedplayerrow][SelectedPlayercol]);
                                 selectedmoveflag = false;
+                                chainb=false;
 
                                 movement = 0;
                             }
@@ -1281,6 +1307,7 @@ public class DraughtsView extends View {
                                 players[Selectedplayerrow - 1][SelectedPlayercol - 1] = "player2king";
                                 Log.d("SelectedMOve", "Row :" + row + " Column:" + column + " status: " + SelectedPlayer[Selectedplayerrow][SelectedPlayercol]);
                                 selectedmoveflag = false;
+                                chainb=false;
 
                                 movement = 0;
                             }
@@ -1300,14 +1327,20 @@ public class DraughtsView extends View {
                                 if (row < 7 && column > 1 && (players[row + 1][column - 1] == "player1" || players[row + 1][column - 1] == "player1king") && players[row + 2][column - 2] == null) {
                                     movement = 1;
                                     selectedmoveflag = false;
+                                    chainb=true;
+
 
                                 } else if (row < 7 && column < 6 && (players[row + 1][column + 1] == "player1" || players[row + 1][column + 1] == "player1king") && players[row + 2][column + 2] == null) {
                                     movement = 1;
                                     selectedmoveflag = false;
+                                    chainb=true;
+
 
                                 } else {
                                     movement = 0;
                                     selectedmoveflag = false;
+                                    chainb=false;
+
 
                                 }
 
@@ -1333,14 +1366,19 @@ public class DraughtsView extends View {
                                 if (row > 1 && column > 1 && (players[row - 1][column - 1] == "player1" || players[row - 1][column - 1] == "player1king") && players[row - 2][column - 2] == null) {
                                     movement = 1;
                                     selectedmoveflag = false;
+                                    chainb=true;
 
                                 } else if (row > 1 && column < 6 && (players[row - 1][column + 1] == "player1" || players[row - 1][column + 1] == "player1king") && players[row - 2][column + 2] == null) {
                                     movement = 1;
                                     selectedmoveflag = false;
+                                    chainb=true;
+
 
                                 } else {
                                     movement = 0;
                                     selectedmoveflag = false;
+                                    chainb=false;
+
 
                                 }
 
@@ -1360,6 +1398,8 @@ public class DraughtsView extends View {
                                 Log.d("SelectedMOve", "Row :" + row + " Column:" + column + " status: " + SelectedPlayer[Selectedplayerrow][SelectedPlayercol]);
                                 selectedmoveflag = false;
                                 movement = 0;
+                                chainb=false;
+
 
                             } else {
                                 selectedmoveflag = false;
@@ -1374,6 +1414,8 @@ public class DraughtsView extends View {
                                 Log.d("SelectedMOve", "Row :" + row + " Column:" + column + " status: " + SelectedPlayer[Selectedplayerrow][SelectedPlayercol]);
                                 selectedmoveflag = false;
                                 movement = 0;
+                                chainb=false;
+
 
                             } else {
                                 selectedmoveflag = false;
@@ -1395,15 +1437,21 @@ public class DraughtsView extends View {
                                 if (row < 6 && column < 6 && (players[row + 1][column + 1] == "player1" || players[row + 1][column + 1] == "player1king") && players[row + 2][column + 2] == null) {
                                     movement = 1;
                                     selectedmoveflag = false;
+                                    chainb=true;
+
 
                                 } else if (row < 6 && column > 1 && (players[row + 1][column - 1] == "player1" || players[row + 1][column - 1] == "player1king") && players[row + 2][column - 2] == null) {
                                     movement = 1;
                                     selectedmoveflag = false;
+                                    chainb=true;
+
 
                                 } else {
 
                                     movement = 0;
                                     selectedmoveflag = false;
+                                    chainb=false;
+
 
                                 }
 
@@ -1425,15 +1473,19 @@ public class DraughtsView extends View {
                                 if (row > 1 && column < 6 && (players[row - 1][column + 1] == "player1" || players[row - 1][column + 1] == "player1king") && players[row - 2][column + 2] == null) {
                                     movement = 1;
                                     selectedmoveflag = false;
+                                    chainb=true;
 
                                 } else if (row > 1 && column > 1 && (players[row - 1][column - 1] == "player1" || players[row - 1][column - 1] == "player1king") && players[row - 2][column - 2] == null) {
                                     movement = 1;
                                     selectedmoveflag = false;
+                                    chainb=true;
 
                                 } else {
 
                                     movement = 0;
                                     selectedmoveflag = false;
+                                    chainb=false;
+
 
                                 }
 
@@ -1467,6 +1519,7 @@ public class DraughtsView extends View {
                             players[Selectedplayerrow + 1][SelectedPlayercol - 1] = "player1";
                             //    Log.d("SelectedMOve", "Row :" + row + " Column:" + column + " status: " + SelectedPlayer[Selectedplayerrow][SelectedPlayercol]);
                             selectedmoveflag = false;
+                            chainb=false;
 
                             movement = 1;
                         }
@@ -1486,20 +1539,25 @@ public class DraughtsView extends View {
                             if (row < 6 && column > 1 && (players[row + 1][column - 1] == "player2" || players[row + 1][column - 1] == "player2king") && players[row + 2][column - 2] == null) {
                                 movement = 0;
                                 selectedmoveflag = false;
+                                chainb=true;
 
                             } else if (row < 6 && column < 6 && (players[row + 1][column + 1] == "player2" || players[row + 1][column + 1] == "player2king") && players[row + 2][column + 2] == null) {
                                 movement = 0;
                                 selectedmoveflag = false;
+                                chainb=true;
+
 
                             } else {
                                 movement = 1;
                                 selectedmoveflag = false;
+                                chainb=false;
 
                             }
 
 
                         } else {
                             movement = 0;
+                            chainb=false;
 
                             selectedmoveflag = false;
 
@@ -1513,6 +1571,8 @@ public class DraughtsView extends View {
                             // Log.d("SelectedMOve", "Row :" + row + " Column:" + column + " status: " + SelectedPlayer[Selectedplayerrow][SelectedPlayercol]);
                             selectedmoveflag = false;
                             movement = 1;
+                            chainb=false;
+
 
                         } else {
                             selectedmoveflag = false;
@@ -1530,15 +1590,20 @@ public class DraughtsView extends View {
                             if (row < 6 && column < 6 && (players[row + 1][column + 1] == "player2" || players[row + 1][column + 1] == "player2king") && players[row + 2][column + 2] == null) {
                                 movement = 0;
                                 selectedmoveflag = false;
+                                chainb=true;
+
 
                             } else if (row < 6 && column > 1 && (players[row + 1][column - 1] == "player2" || players[row + 1][column - 1] == "player2king") && players[row + 2][column - 2] == null) {
                                 movement = 0;
                                 selectedmoveflag = false;
+                                chainb=true;
+
 
                             } else {
 
                                 movement = 1;
                                 selectedmoveflag = false;
+                                chainb=false;
 
                             }
 
@@ -1570,6 +1635,7 @@ public class DraughtsView extends View {
                             players[Selectedplayerrow + 1][SelectedPlayercol - 1] = "player1king";
                             Log.d("SelectedMOve", "Row :" + row + " Column:" + column + " status: " + SelectedPlayer[Selectedplayerrow][SelectedPlayercol]);
                             selectedmoveflag = false;
+                            chainb=false;
 
                             movement = 1;
                         }
@@ -1583,6 +1649,7 @@ public class DraughtsView extends View {
                             players[Selectedplayerrow - 1][SelectedPlayercol - 1] = "player1king";
                             Log.d("SelectedMOve", "Row :" + row + " Column:" + column + " status: " + SelectedPlayer[Selectedplayerrow][SelectedPlayercol]);
                             selectedmoveflag = false;
+                            chainb=false;
 
                             movement = 1;
                         }
@@ -1602,14 +1669,20 @@ public class DraughtsView extends View {
                             if (row < 7 && column > 1 && (players[row + 1][column - 1] == "player2" || players[row + 1][column - 1] == "player2king") && players[row + 2][column - 2] == null) {
                                 movement = 0;
                                 selectedmoveflag = false;
+                                chainb=true;
+
 
                             } else if (row < 7 && column < 6 && (players[row + 1][column + 1] == "player2" || players[row + 1][column + 1] == "player2king") && players[row + 2][column + 2] == null) {
                                 movement = 0;
                                 selectedmoveflag = false;
+                                chainb=true;
+
 
                             } else {
                                 movement = 1;
                                 selectedmoveflag = false;
+                                chainb=false;
+
 
                             }
 
@@ -1635,14 +1708,20 @@ public class DraughtsView extends View {
                             if (row > 1 && column > 1 && (players[row - 1][column - 1] == "player2" || players[row - 1][column - 1] == "player2king") && players[row - 2][column - 2] == null) {
                                 movement = 0;
                                 selectedmoveflag = false;
+                                chainb=true;
+
 
                             } else if (row > 1 && column < 6 && (players[row - 1][column + 1] == "player2" || players[row - 1][column + 1] == "player2king") && players[row - 2][column + 2] == null) {
                                 movement = 0;
                                 selectedmoveflag = false;
+                                chainb=true;
+
 
                             } else {
                                 movement = 1;
                                 selectedmoveflag = false;
+                                chainb=false;
+
 
                             }
 
@@ -1662,6 +1741,8 @@ public class DraughtsView extends View {
                             Log.d("SelectedMOve", "Row :" + row + " Column:" + column + " status: " + SelectedPlayer[Selectedplayerrow][SelectedPlayercol]);
                             selectedmoveflag = false;
                             movement = 1;
+                            chainb=false;
+
 
                         } else {
                             selectedmoveflag = false;
@@ -1676,6 +1757,8 @@ public class DraughtsView extends View {
                             Log.d("SelectedMOve", "Row :" + row + " Column:" + column + " status: " + SelectedPlayer[Selectedplayerrow][SelectedPlayercol]);
                             selectedmoveflag = false;
                             movement = 1;
+                            chainb=false;
+
 
                         } else {
                             selectedmoveflag = false;
@@ -1697,15 +1780,20 @@ public class DraughtsView extends View {
                             if (row < 6 && column < 6 && (players[row + 1][column + 1] == "player2" || players[row + 1][column + 1] == "player2king") && players[row + 2][column + 2] == null) {
                                 movement = 0;
                                 selectedmoveflag = false;
+                                chainb=true;
+
 
                             } else if (row < 6 && column > 1 && (players[row + 1][column - 1] == "player2" || players[row + 1][column - 1] == "player2king") && players[row + 2][column - 2] == null) {
                                 movement = 0;
                                 selectedmoveflag = false;
+                                chainb=true;
+
 
                             } else {
 
                                 movement = 1;
                                 selectedmoveflag = false;
+                                chainb=false;
 
                             }
 
@@ -1727,15 +1815,20 @@ public class DraughtsView extends View {
                             if (row > 1 && column < 6 && (players[row - 1][column + 1] == "player2" || players[row - 1][column + 1] == "player2king") && players[row - 2][column + 2] == null) {
                                 movement = 0;
                                 selectedmoveflag = false;
+                                chainb=true;
+
 
                             } else if (row > 1 && column > 1 && (players[row - 1][column - 1] == "player2" || players[row - 1][column - 1] == "player2king") && players[row - 2][column - 2] == null) {
                                 movement = 0;
                                 selectedmoveflag = false;
+                                chainb=true;
+
 
                             } else {
 
                                 movement = 1;
                                 selectedmoveflag = false;
+                                chainb=false;
 
                             }
 
